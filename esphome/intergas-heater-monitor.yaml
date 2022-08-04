@@ -1,0 +1,510 @@
+substitutions:
+  devicename: intergas-xtreme-monitor
+  friendly_devicename: Intergas Xtreme monitoring
+
+esphome:
+  name: ${devicename}
+  includes:
+    - IntergasHeaterMonitor.h
+
+esp8266:
+  board: nodemcuv2
+
+wifi:
+  power_save_mode: HIGH # for ESP8266 LIGHT/HIGH are mixed up, esphome/issues/issues/1532
+  networks:
+  - ssid: !secret esphome_wifi_network_ssid
+    password: !secret esphome_wifi_network_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "${devicename} WiFi"
+    password: !secret esphome_wifi_ap_fallback_password
+
+captive_portal:
+
+# Enable logging
+# The ESP8266 has 2 UARTs:
+# UART0 supports Tx/Rx, but it is also used for logging output.
+# UART1 supports only Tx
+#
+# UART0 can also be remapped to different GPIO pins during runtime, and if we
+# disable logging to the UART, there will be no rubish send to the heater.
+# But, if D8/GPIO15 is pulled high during boot, then the ESP8266 will not boot
+# at all. Now the Intergas heater actually pulls this Tx pin high...
+# Used UART1 only for Tx and UART0 for Rx only will not work either as that
+# UART1-Tx is polluted with boot loader logging.
+#
+# So, the connection is as follows:
+# - We use Tx and Rx from UART0.
+# - We disable logging to the UART.
+# - We remap the Rx pin of UART0 to pin D7 and the Tx pin to pin D8.
+#   (= GPIO 13 and GPIO15) to decouple from any boot activity
+#   that may occur on the USB port.
+# - We use a optocoupler to decouple from feeding back any voltage from the
+#   heater into the D8 pin.
+logger:
+  hardware_uart: UART1
+  baud_rate : 0  # Disable logging to the UART, keep working via WIFI
+  level: INFO
+
+# Enable Home Assistant API
+api:
+  password: !secret esphome_hassio_api_pw
+
+ota:
+  safe_mode: True
+  password: !secret esphome_hassio_ota_pw
+  on_begin:
+    then:
+      - logger.log: "OTA start"
+      - lambda: |-
+          static_cast<IntergasHeaterMonitor*>(id(intergas_heater_monitor))->stop_polling();
+
+# Disabled the web server since it consumes a lot of RAM, and we seem to have memory issues.
+# See https://esphome.io/components/web_server.html?highlight=web_server
+#web_server:
+#  port: 80
+
+# A number of One-Wire sensors can be added to the ESP8266, use this pin for it.
+dallas:
+  - pin: D2
+    update_interval: 20s
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+switch:
+  - platform: restart
+    name: "Intergas Xtreme monitor restart"
+
+binary_sensor:
+  - platform: template
+    name: Heater Pump
+    id: heater_pump_running
+    icon: "mdi:pump"
+    device_class: running
+
+  - platform: template
+    name: Heater Open-Therm
+    id: heater_open_therm
+    icon: "mdi:current-ac"
+    device_class: connectivity
+
+  - platform: template
+    name: GP Switch
+    id: heater_gp_switch
+    icon: "mdi:switch"
+
+  - platform: template
+    name: Tap Switch
+    id: heater_tap_switch
+    icon: "mdi:switch"
+    device_class: opening
+
+  - platform: template
+    name: Room Thermostat
+    id: heater_roomtherm
+    icon: "mdi:switch"
+    device_class: connectivity
+
+  - platform: template
+    name: Alarm status
+    id: heater_alarm_status
+    icon: "mdi:alarm-light"
+    device_class: problem
+
+  - platform: template
+    name: Cascade Relay
+    id: heater_cascade_relay
+    icon: "mdi:switch"
+    device_class: connectivity
+
+  - platform: template
+    name: Gas valve
+    id: heater_gas_valve
+    icon: "mdi:valve"
+    device_class: opening
+
+  - platform: template
+    name: Spark active
+    id: heater_spark
+    icon: "mdi:lightning-bolt"
+
+  - platform: template
+    name: Ionisation signal
+    id: heater_ionisation_signal
+    icon: "mdi:lightning-bolt"
+
+  - platform: template
+    name: Open Therm disabled
+    id: heater_ot_disabled
+    icon: "mdi:switch"
+
+  - platform: template
+    name: Low water pressure
+    id: heater_has_low_water_pressure
+    icon: "mdi:gauge"
+
+  - platform: template
+    name: Burner block
+    id: heater_burner_block
+    icon: "mdi:fire"
+
+  - platform: template
+    name: Gradient flag
+    id: heater_gradient_flag
+    icon: "mdi:switch"
+
+sensor:
+  - platform: template
+    name: Line power connected time
+    id: line_power_connected_hours
+    icon: "mdi:clock-start"
+    unit_of_measurement: Hours
+    accuracy_decimals: 0
+
+  - platform: template
+    name: Line power connected
+    id: line_power_connected_count
+    icon: "mdi:counter"
+    unit_of_measurement: Count
+    accuracy_decimals: 0
+
+  - platform: template
+    name: Central Heating Usage
+    id: ch_function_hours
+    icon: "mdi:clock-start"
+    unit_of_measurement: Hours
+    accuracy_decimals: 0
+
+  - platform: template
+    name: Domestic Hot Water Usage
+    id: dhw_function_hours
+    icon: "mdi:clock-start"
+    unit_of_measurement: Hours
+    accuracy_decimals: 0
+
+  - platform: template
+    name: Burner starts
+    id: burner_start_count
+    icon: "mdi:counter"
+    unit_of_measurement: Starts
+    accuracy_decimals: 0
+
+  - platform: template
+    name: Ignition failed
+    id: ignition_failed
+    icon: "mdi:counter"
+    unit_of_measurement: Failures
+    accuracy_decimals: 0
+
+  - platform: template
+    name: Flame lost
+    id: flame_lost
+    icon: "mdi:counter"
+    unit_of_measurement: Losses
+    accuracy_decimals: 0
+
+  - platform: template
+    name: Reset
+    id: reset_count
+    icon: "mdi:counter"
+    unit_of_measurement: Resets
+    accuracy_decimals: 0
+
+  - platform: template
+    name: Gas meter Central Heating
+    id: gas_meter_ch
+    icon: "mdi:meter-gas"
+    unit_of_measurement: m3
+    accuracy_decimals: 4
+
+  - platform: template
+    name: Gas meter Domestic Hot Water
+    id: gas_meter_dhw
+    icon: "mdi:meter-gas"
+    unit_of_measurement: m3
+    accuracy_decimals: 4
+
+  - platform: template
+    name: Water meter
+    id: water_meter
+    icon: "mdi:gauge"
+    unit_of_measurement: m3
+    accuracy_decimals: 4
+
+  - platform: template
+    name: Burner starts Domestic Hot Water
+    id: burner_starts_dhw_count
+    icon: "mdi:counter"
+    unit_of_measurement: Starts
+    accuracy_decimals: 0
+
+  - platform: template
+    name: Fan Current speed
+    id: fanspeed
+    icon: "mdi:fan"
+    unit_of_measurement: RPM
+    accuracy_decimals: 0
+
+  - platform: template
+    name: Fan setpoint
+    id: fanspeed_set
+    icon: "mdi:fan"
+    unit_of_measurement: RPM
+    accuracy_decimals: 0
+
+  - platform: template
+    name: Pump Current speed
+    id: pumpspeed
+    icon: "mdi:pump"
+    unit_of_measurement: RPM
+    accuracy_decimals: 0
+
+  - platform: template
+    name: Pump setpoint
+    id: pumpspeed_set
+    icon: "mdi:pump"
+    unit_of_measurement: RPM
+    accuracy_decimals: 0
+
+#  - platform: template
+#    name: Valve Position
+#    id: valve_pos
+#    icon: "mdi:valve"
+#    accuracy_decimals: 0
+
+#  - platform: template
+#    name: Valve Position setpoint
+#    id: valve_pos_set
+#    icon: "mdi:valve"
+#    accuracy_decimals: 0
+
+  - platform: template
+    name: Tap flow
+    id: tapflow
+    icon: "mdi:water-pump"
+    unit_of_measurement: '%'
+    accuracy_decimals: 0
+
+  - platform: template
+    name: Heater IO Current
+    id: heater_io_current
+    icon: "mdi:current-dc"
+    accuracy_decimals: 2
+    unit_of_measurement: µA
+
+  - platform: template
+    name: Heater Pressure
+    id: pressure
+    icon: "mdi:gauge-full"
+    unit_of_measurement: BAR
+    accuracy_decimals: 2
+
+  - platform: template
+    name: Heat Exchanger Temperature (S0)
+    id: temperature_heat_exchanger
+    unit_of_measurement: °C
+    accuracy_decimals: 2
+    device_class: temperature
+
+#  - platform: template
+#    name: Heat Exchanger 2 Temperature
+#    id: temperature_heat_exchanger_2
+#    unit_of_measurement: °C
+#    accuracy_decimals: 2
+#    device_class: temperature
+
+  - platform: template
+    name: Delivery Temperature (S1)
+    id: temperature_flow
+    unit_of_measurement: °C
+    accuracy_decimals: 2
+    device_class: temperature
+
+  - platform: template
+    name: Outside Temperature (S6)
+    id: temperature_outside
+    unit_of_measurement: °C
+    accuracy_decimals: 2
+    device_class: temperature
+
+#  - platform: template
+#    name: Return Temperature
+#    id: temperature_return
+#    unit_of_measurement: °C
+#    accuracy_decimals: 2
+#    device_class: temperature
+
+  - platform: template
+    name: Hot water Temperature (S3)
+    id: temperature_hot_water
+    unit_of_measurement: °C
+    accuracy_decimals: 2
+    device_class: temperature
+
+  - platform: template
+    name: Cold Water Temperature (S7)
+    id: temperature_cold_water
+    unit_of_measurement: °C
+    accuracy_decimals: 2
+    device_class: temperature
+
+  - platform: template
+    name: Flue gas Temperature (S5)
+    id: temperature_flue_gas
+    unit_of_measurement: °C
+    accuracy_decimals: 2
+    device_class: temperature
+
+  - platform: template
+    name: Solar Boiler temperature
+    id: temperature_boiler
+    unit_of_measurement: °C
+    accuracy_decimals: 2
+    device_class: temperature
+
+  - platform: template
+    name: Setpoint
+    id: temperature_setpoint
+    unit_of_measurement: °C
+    accuracy_decimals: 2
+    device_class: temperature
+
+  - platform: template
+    name: Zone 1 room override
+    id: zone1_room_override
+    unit_of_measurement: °C
+    accuracy_decimals: 2
+    device_class: temperature
+
+  - platform: template
+    name: Zone 1 room setpoint
+    id: zone1_room_setpoint
+    unit_of_measurement: °C
+    accuracy_decimals: 2
+    device_class: temperature
+
+  - platform: template
+    name: Zone 1 room Temperature
+    id: zone1_room_temperature
+    unit_of_measurement: °C
+    accuracy_decimals: 2
+    device_class: temperature
+
+  - platform: template
+    name: Zone 2 room override
+    id: zone2_room_override
+    unit_of_measurement: °C
+    accuracy_decimals: 2
+    device_class: temperature
+
+  - platform: template
+    name: Zone 2 room setpoint
+    id: zone2_room_setpoint
+    unit_of_measurement: °C
+    accuracy_decimals: 2
+    device_class: temperature
+
+  - platform: template
+    name: Zone 2 room Temperature
+    id: zone2_room_temperature
+    unit_of_measurement: °C
+    accuracy_decimals: 2
+    device_class: temperature
+
+  - platform: template
+    name: Outside override Temperature
+    id: override_outside_temp
+    unit_of_measurement: °C
+    accuracy_decimals: 2
+    device_class: temperature
+
+  - platform: uptime
+    name: Uptime Sensor
+    id: uptime_sensor
+    update_interval: 60s
+    icon: mdi:clock-start
+
+  - platform: wifi_signal
+    name: "Boiler Room WiFi Signal"
+    update_interval: 60s
+
+text_sensor:
+  - platform: template
+    name: LT/HT Zone valve
+    id: heater_dwk
+    icon: "mdi:valve"
+
+  - platform: template
+    name: Heater Status code
+    id: heater_status_code
+    icon: "mdi:text-box"
+
+  - platform: template
+    name: Fault Code
+    id: heater_fault_code
+    icon: "mdi:text-box"
+
+  - platform: template
+    name: Last Fault code
+    id: heater_last_fault_code
+    icon: "mdi:text-box"
+
+  - platform: template
+    name: Heater Hardware release
+    id: hardware_release
+    icon: "mdi:text-box"
+
+  - platform: template
+    name: Heater Software release
+    id: software_release
+    icon: "mdi:text-box"
+
+  - platform: template
+    name: Heater ROM 1 Checksum
+    id: rom_test_1_checksum
+    icon: "mdi:text-box"
+
+  - platform: template
+    name: Heater ROM 2 Checksum
+    id: rom_test_2_checksum
+    icon: "mdi:text-box"
+
+  - platform: template
+    name: Heater DSP Hardware release
+    id: dsp_hardware_release
+    icon: "mdi:text-box"
+
+  - platform: template
+    name: Heater DSP Software release
+    id: dsp_software_release
+    icon: "mdi:text-box"
+
+  - platform: template
+    name: Heater DSP ROM 1 Checksum
+    id: dsp_rom_test_1_checksum
+    icon: "mdi:text-box"
+
+  - platform: template
+    name: Heater DSP ROM 2 Checksum
+    id: dsp_rom_test_2_checksum
+    icon: "mdi:text-box"
+
+  - platform: template
+    name: Production Code
+    id: production_code
+    icon: "mdi:text-box"
+
+  - platform: template
+    name: Monitor Status
+    id: monitor_status
+    icon: "mdi:text-box"
+
+custom_component:
+  - lambda: |-
+      return {new IntergasHeaterMonitor()};
+    components:
+      - id: intergas_heater_monitor
