@@ -5,7 +5,7 @@ substitutions:
 esphome:
   name: ${devicename}
   includes:
-    - IntergasHeaterMonitor.h
+    - IntergasXtremeMonitor.h
 
 esp8266:
   board: nodemcuv2
