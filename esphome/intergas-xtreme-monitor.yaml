@@ -66,11 +66,6 @@ ota:
 #web_server:
 #  port: 80
 
-# A number of One-Wire sensors can be added to the ESP8266, use this pin for it.
-dallas:
-  - pin: D2
-    update_interval: 20s
-
 time:
   - platform: homeassistant
     id: homeassistant_time
