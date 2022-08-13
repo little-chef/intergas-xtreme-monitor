@@ -3,8 +3,8 @@
 This project provides the necessary tools and scripts to monitor a Intergas
 central heating system via the IDS interface.
 
-It connects a ESP8266 board through optocouplers to the burner control board of
-the Intergas Xtreme. From there detailed statistics are published to
+It connects a ESP8266 or ESP32 NodeMCU board through optocouplers to the burner control
+board of the Intergas Xtreme. From there detailed statistics are published to
 Home Assistant for accurate monitoring of the device.
 
 This project has only been tested with a Intergas Xtreme 36 central heater.
@@ -27,7 +27,9 @@ Prerequisites for the physical connection:
 
 * As opto coupler we use the [4N25](https://www.conrad.nl/p/lite-on-optocoupler-fototransistor-4n25-dip-6-transistor-dc-1127375) type.
 
-* As controller we use a [NodeMCU v2 Lua ESP-12E (ESP8266)](https://www.nodemcu.com/index_en.html) Wifi development board.
+* As controller we either use:
+  * a [NodeMCU-32s (ESP32)](https://esphome.io/devices/nodemcu_esp32.html) Development board (preferred)
+  * a [NodeMCU v2 Lua ESP-12E (ESP8266)](https://www.nodemcu.com/index_en.html) Wifi development board.
 
 
 # Schematics design
@@ -52,7 +54,13 @@ Here are the installation steps for the software in ESPHome:
   $ git clone https://github.com/little-chef/intergas-xtreme-monitor.git intergas-xtreme
   $ cd ../esphome
   $ ln -s ../intergas-xtreme/esphome/IntergasHeaterMonitor.h
-  $ ln -s ../intergas-xtreme/esphome/intergas-heater-monitor.yaml
+  $ ln -s ../intergas-xtreme/esphome/intergas-xtreme-monitor-base.include
+
+  # For the NodeMCU-32s board, create this link:
+  $ ln -s ../intergas-xtreme/esphome/intergas-xtreme-monitor-esp32.yaml intergas-heater-monitor.yaml
+
+  # And for the NodeMCU-V2-ESP8266 board, use this link:
+  $ ln -s ../intergas-xtreme/esphome/intergas-xtreme-monitor-esp8266.yaml intergas-heater-monitor.yaml
   ```
   Next create the config/secrets.yaml file and add the following lines:
   ```
@@ -64,7 +72,7 @@ Here are the installation steps for the software in ESPHome:
   ```
 
 * Go to the ESPHome dashboard on Home Assistant, the new device should be visible. From
-  here you can compile the firmware for the ESP8266, and install it to NodeMCU device.
+  here you can compile the firmware for the NodeMCU, and install it to NodeMCU device.
 * Once the device is running, a new notification will pop up to register the device to your
   Home Assistant instance. Complete that procedure.
 * After everything is successful, the metrics will become visible on the Home Assistant Dashboard.
@@ -79,12 +87,13 @@ The code and content have been inspired by these public sources:
 * https://gathering.tweakers.net/forum/list_messages/2056344
 * https://theintergasshop.co.uk/content/181-intergas-boiler-manuals -> IDS X Range Software
 
-# Limitations
+# Limitations of the ESP8266 NodeMCU
 The monitor adds a lot of sensors to the Home-Assistant dashboard while using a ESP8266
 NodeMCU. The ESP8266 may run into some performance issues such that OTA updates go very
 slow, and may result in timeouts on the Wifi connection. In those cases the updates need
 to be done via USB. Runtime though, the ESP8266 will operate reliable and no network
 connection issues are to be epected.
+The more powerful ESP32 does not show these kind of issues, and is therefor preferred.
 
 # Final Note:
 

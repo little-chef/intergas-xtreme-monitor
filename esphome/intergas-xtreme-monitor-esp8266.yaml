@@ -1,0 +1,38 @@
+substitutions:
+  devicename: intergas-xtreme-monitor
+  friendly_devicename: Intergas Xtreme monitoring
+
+esp8266:
+  board: nodemcuv2
+
+# Enable logging
+# The ESP8266 has 2 UARTs:
+# UART0 supports Tx/Rx, but it is also used for logging output.
+# UART1 supports only Tx
+#
+# UART0 can also be remapped to different GPIO pins during runtime, and if we
+# disable logging to the UART, there will be no rubish send to the heater.
+# But, if D8/GPIO15 is pulled high during boot, then the ESP8266 will not boot
+# at all. Now the Intergas heater actually pulls this Tx pin high...
+# Used UART1 only for Tx and UART0 for Rx only will not work either as that
+# UART1-Tx is polluted with boot loader logging.
+#
+# So, the connection is as follows:
+# - We use Tx and Rx from UART0.
+# - We disable logging to the UART.
+# - We remap the Rx pin of UART0 to pin D7 and the Tx pin to pin D8.
+#   (= GPIO 13 and GPIO15) to decouple from any boot activity
+#   that may occur on the USB port.
+# - We use a optocoupler to decouple from feeding back any voltage from the
+#   heater into the D8 pin.
+logger:
+  hardware_uart: UART1
+  baud_rate : 0  # Disable logging to the UART, keep working via WIFI
+  level: INFO
+
+# Disabled the web server since it consumes a lot of RAM, and we seem to have memory issues.
+# See https://esphome.io/components/web_server.html?highlight=web_server
+#web_server:
+#  port: 80
+
+<<: !include intergas-xtreme-monitor-base.include

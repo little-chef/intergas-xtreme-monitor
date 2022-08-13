@@ -1,15 +1,31 @@
 #include "esphome.h"
+#include "esphome/core/defines.h"
 
 #define TAG "Intergas Xtreme"
 
 class IntergasHeaterMonitor : public PollingComponent {
     public:
-        IntergasHeaterMonitor() : PollingComponent(2000) {}
+        IntergasHeaterMonitor() : PollingComponent(500) {}
+
+        // Settings for the ESP8266-nodemcuv2 board
+#       ifdef USE_ARDUINO
+#       ifdef USE_ESP8266
+        void init_serial() {
+            Serial.swap();
+        }
+#       endif
+#       endif
+
+        // Settings for the ESP32 board
+#       ifdef USE_ESP32_FRAMEWORK_ARDUINO
+#       define Serial Serial2
+        void init_serial() {}
+#       endif
 
         void stop_polling() {
             TextSensor_publish(monitor_status, "Stopped");
             ESP_LOGI(TAG, "Monitor stopped");
-            Serial.swap();
+            init_serial();
             next_state = STOPPED;
         }
 
@@ -141,7 +157,7 @@ class IntergasHeaterMonitor : public PollingComponent {
             ESP_LOGI(TAG, "Current State: INIT");
             TextSensor_publish(monitor_status, "Init");
             banner();
-            Serial.swap();
+            init_serial();
             return WAIT_CONNECTED;
         }
 
@@ -173,6 +189,7 @@ class IntergasHeaterMonitor : public PollingComponent {
                 return SEND_NEXT_COMMAND;
             }
             current_command = ids_cmd;
+            switch_onboard_led(true);
 
             std::string log_cmd = get_log_cmd(ids_cmd->cmd);
             TextSensor_publish(monitor_status, (std::string("Fetching: " + log_cmd)).c_str());
@@ -182,10 +199,12 @@ class IntergasHeaterMonitor : public PollingComponent {
             } else {
                 Serial.write(ids_cmd->cmd.c_str());
             }
+            switch_onboard_led(false);
             return PARSE_RESPONSE;
         }
 
         ControlState state_parse_respond() {
+            switch_onboard_led(true);
             TextSensor_publish(monitor_status, "Processing...");
             ControlState next_state = SEND_NEXT_COMMAND;
             ids_command *ids_cmd = current_command;
@@ -199,6 +218,7 @@ class IntergasHeaterMonitor : public PollingComponent {
                 } else {
                     ESP_LOGE(TAG, "Invalid status response received. Not enough data");
                 }
+                switch_onboard_led(false);
                 return next_state;
             }
 
@@ -212,12 +232,14 @@ class IntergasHeaterMonitor : public PollingComponent {
                 ESP_LOGD(TAG, "Response %s Data: %s",
                     get_log_cmd(ids_cmd->cmd).c_str(),
                     format_hex_pretty(sbuf.data(), len).c_str());
+                switch_onboard_led(false);
                 return next_state;
             }
 
             // Call the function pointer
             cmd_fptr f = ids_cmd->data_handler;
             (this->*f)(ids_cmd->cmd, sbuf);
+            switch_onboard_led(false);
             return next_state;
         }
 
@@ -261,7 +283,7 @@ class IntergasHeaterMonitor : public PollingComponent {
             Sensor_publish(temperature_flue_gas, getTemp(sbuf[11], sbuf[10]));
             Sensor_publish(temperature_setpoint, getTemp(sbuf[15], sbuf[14])); // Listed as T.max...
             Sensor_publish(temperature_outside, getTemp(sbuf[17],  sbuf[16]));
-            Sensor_publish(temperature_boiler, getTemp(sbuf[19],  sbuf[18]));
+            Sensor_publish(temperature_boiler_to_heater, getTemp(sbuf[19],  sbuf[18]));
 
             ch_pressure = getFloat(sbuf[13], sbuf[12]);
             ch_has_pressure_sensor = get_bit(sbuf[28], 5);
@@ -288,7 +310,7 @@ class IntergasHeaterMonitor : public PollingComponent {
             case 126: heater_status = "Central Heating idle"; break;
             case 204: heater_status = "Hot water ramp down"; break;
             case 231: heater_status = "Central Heating ramp down"; break;
-            default:  heater_status = "Code: " + std::to_string(sbuf[24]); break;
+            default:  heater_status = "Code: " + esphome::to_string(sbuf[24]); break;
             }
             TextSensor_publish(heater_status_code, heater_status);
 
@@ -457,7 +479,7 @@ class IntergasHeaterMonitor : public PollingComponent {
             int16_t word = (int16_t)(_msb << 8 | lsb);
             if ((word <= -5100) || (word == SHRT_MAX)) {
                 // Intergas gives -5100 for disconnected sensors
-                return std::nan("1");
+                return nan("1");
             }
             return ((float)word) / 100.0;
         }
@@ -506,6 +528,18 @@ class IntergasHeaterMonitor : public PollingComponent {
             return !value1.compare(value2);
         }
 
+        void switch_onboard_led(const bool value) {
+        // Settings for the ESP32 board
+#       ifdef USE_ESP32_FRAMEWORK_ARDUINO
+                BinaryOutput *output = static_cast<BinaryOutput *>(onboard_led);
+                if (value) {
+                    output->turn_on();
+                } else {
+                    output->turn_off();
+                }
+#       endif
+        }
+
         std::string prettify_fault_code(uint8_t code) {
             std::string fault_string;
             switch (code) {
@@ -533,7 +567,7 @@ class IntergasHeaterMonitor : public PollingComponent {
             case 30: fault_string = "F030 - Sensor S3 fault"; break;
             case 31: fault_string = "F031 - Sensor fault S1"; break;
             case 0xff: fault_string = "No Fault detected"; break;
-            default: fault_string = "Unspecified fault: " + std::to_string(code); break;
+            default: fault_string = "Unspecified fault: " + esphome::to_string(code); break;
             }
             return fault_string;
         }
