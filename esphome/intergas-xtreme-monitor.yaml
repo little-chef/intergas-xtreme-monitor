@@ -1,6 +1,6 @@
 
 substitutions:
-  devicename: "intergas-xtreme-monitor"
+  devicename: intergas-xtreme-monitor
   friendly_devicename: Intergas Xtreme monitoring
 
 esp32:
