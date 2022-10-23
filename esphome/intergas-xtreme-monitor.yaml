@@ -1,10 +1,52 @@
+
+substitutions:
+  devicename: "intergas-xtreme-monitor"
+  friendly_devicename: Intergas Xtreme monitoring
+
+esp32:
+  board: nodemcu-32s
+
+# Enable logging
+# The ESP32 has 3 UARTs:
+# UART0 is used for logging output.
+# UART2 is used for communicating to the heater
+#
+# - We use Tx and Rx from UART2.
+# - We use optocouplers to decouple from feeding back any voltage from the
+#   heater into the GPIO16+GPIO17 pins, and to galvanic decouple the monitor
+#   from the central heating system and to reduce the risk of damaging it when
+#   some malfunction happens inside the monitor.
+uart:
+  - id: uart_2
+    rx_pin: GPIO16
+    tx_pin: GPIO17
+    baud_rate: 9600
+
+logger:
+  hardware_uart: UART0
+  level: DEBUG
+  baud_rate : 115200
+
+web_server:
+  port: 80
+
+output:
+  - platform: ledc
+    id: onboard_led
+    pin:
+      number: GPIO2
+
+# A number of One-Wire sensors can be added to the ESP32.
+dallas:
+  - pin: GPIO27
+    update_interval: 2s
+
 esphome:
   name: ${devicename}
   includes:
     - IntergasXtremeMonitor.h
 
 wifi:
-  power_save_mode: HIGH # for ESP8266 LIGHT/HIGH are mixed up, esphome/issues/issues/1532
   networks:
   - ssid: !secret esphome_wifi_network_ssid
     password: !secret esphome_wifi_network_password
@@ -27,7 +69,7 @@ ota:
     then:
       - logger.log: "OTA start"
       - lambda: |-
-          static_cast<IntergasHeaterMonitor*>(id(intergas_heater_monitor))->stop_polling();
+          static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->stop_polling();
 
 time:
   - platform: homeassistant
@@ -463,6 +505,6 @@ text_sensor:
 
 custom_component:
   - lambda: |-
-      return {new IntergasHeaterMonitor()};
+      return {new IntergasXtremeMonitor()};
     components:
-      - id: intergas_heater_monitor
+      - id: intergas_xtreme_monitor

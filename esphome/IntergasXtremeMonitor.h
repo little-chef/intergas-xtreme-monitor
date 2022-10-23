@@ -1,31 +1,14 @@
 #include "esphome.h"
-#include "esphome/core/defines.h"
 
 #define TAG "Intergas Xtreme"
 
-class IntergasHeaterMonitor : public PollingComponent {
+class IntergasXtremeMonitor : public PollingComponent {
     public:
-        IntergasHeaterMonitor() : PollingComponent(500) {}
-
-        // Settings for the ESP8266-nodemcuv2 board
-#       ifdef USE_ARDUINO
-#       ifdef USE_ESP8266
-        void init_serial() {
-            Serial.swap();
-        }
-#       endif
-#       endif
-
-        // Settings for the ESP32 board
-#       ifdef USE_ESP32_FRAMEWORK_ARDUINO
-#       define Serial Serial2
-        void init_serial() {}
-#       endif
+        IntergasXtremeMonitor() : PollingComponent(500) {}
 
         void stop_polling() {
             TextSensor_publish(monitor_status, "Stopped");
             ESP_LOGI(TAG, "Monitor stopped");
-            init_serial();
             next_state = STOPPED;
         }
 
@@ -41,7 +24,7 @@ class IntergasHeaterMonitor : public PollingComponent {
         };
         ControlState next_state = PRE_INIT;
 
-        typedef void (IntergasHeaterMonitor::*cmd_fptr)(std::string,
+        typedef void (IntergasXtremeMonitor::*cmd_fptr)(std::string,
                                                         const std::vector<uint8_t> &);
 
         struct ids_command {
@@ -55,15 +38,44 @@ class IntergasHeaterMonitor : public PollingComponent {
 
         std::vector<ids_command> ids_commands = {
             // Retrieve data from heater.
-            { "REV",  false, 32, &IntergasHeaterMonitor::process_rev,          3600, 0 },
-            { "REW",  true,  32, &IntergasHeaterMonitor::process_rew,          3600, 0 },
-            { "B?\r", true,  32, &IntergasHeaterMonitor::process_prod_code,    3600, 0 },
-            { "H0\r", true,  32, &IntergasHeaterMonitor::process_runtime_stats,  60, 0 },
+            { "REV",  false, 32, &IntergasXtremeMonitor::process_rev,          3600, 0 },
+            { "REW",  true,  32, &IntergasXtremeMonitor::process_rew,          3600, 0 },
+            { "B?\r", true,  32, &IntergasXtremeMonitor::process_prod_code,    3600, 0 },
+            { "H0\r", true,  32, &IntergasXtremeMonitor::process_runtime_stats,  60, 0 },
 
             // Runtime metrics
-            { "S?\r", true,  32, &IntergasHeaterMonitor::process_status,          5, 0 },
-            { "S2\r", true,  32, &IntergasHeaterMonitor::process_status_extra,    5, 0 },
-            { "D2\r", true,  32, &IntergasHeaterMonitor::process_status_extra_2,  5, 0 },
+            { "S?\r", true,  32, &IntergasXtremeMonitor::process_status,          5, 0 },
+            { "S2\r", true,  32, &IntergasXtremeMonitor::process_status_extra,    5, 0 },
+            { "D2\r", true,  32, &IntergasXtremeMonitor::process_status_extra_2,  5, 0 },
+
+            // Other values, just for logging
+            { "H1\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "H2\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "H3\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "H4\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "H5\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "H6\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "H7\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "E0\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "G1\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "B1\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "V0\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "V1\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "V2\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "V3\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "V4\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "V5\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "V6\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "V7\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "V8\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "V9\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "V:\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "V;\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "V<\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "V=\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "V>\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "V?\r", true,  32, &IntergasXtremeMonitor::process_params,       3600, 0 },
+            { "CRC",  true,  32, &IntergasXtremeMonitor::process_crc_register, 3600, 0 },
         };
         ids_command *current_command;
 
@@ -120,7 +132,7 @@ class IntergasHeaterMonitor : public PollingComponent {
         }
 
         void setup() override {
-            Serial.begin(9600);
+            Serial2.begin(9600);
             next_state = INIT;
         }
 
@@ -157,7 +169,6 @@ class IntergasHeaterMonitor : public PollingComponent {
             ESP_LOGI(TAG, "Current State: INIT");
             TextSensor_publish(monitor_status, "Init");
             banner();
-            init_serial();
             return WAIT_CONNECTED;
         }
 
@@ -195,21 +206,19 @@ class IntergasHeaterMonitor : public PollingComponent {
             TextSensor_publish(monitor_status, (std::string("Fetching: " + log_cmd)).c_str());
             ESP_LOGD(TAG, "Send command %s", log_cmd.c_str());
             if (ids_cmd->crc_needed) {
-                Serial.write(add_command_crc(ids_cmd->cmd).c_str());
+                Serial2.write(add_command_crc(ids_cmd->cmd).c_str());
             } else {
-                Serial.write(ids_cmd->cmd.c_str());
+                Serial2.write(ids_cmd->cmd.c_str());
             }
-            switch_onboard_led(false);
             return PARSE_RESPONSE;
         }
 
         ControlState state_parse_respond() {
-            switch_onboard_led(true);
             TextSensor_publish(monitor_status, "Processing...");
             ControlState next_state = SEND_NEXT_COMMAND;
             ids_command *ids_cmd = current_command;
 
-            size_t len = Serial.available();
+            size_t len = Serial2.available();
 
             // Check if enough data is received
             if (len < ids_cmd->response_len) {
@@ -223,7 +232,7 @@ class IntergasHeaterMonitor : public PollingComponent {
             }
 
             std::vector<uint8_t> sbuf(len);
-            Serial.readBytes(sbuf.data(), len);
+            Serial2.readBytes(sbuf.data(), len);
 
             // Verify response checksum, that is the last byte of the data set
             if ((ids_cmd->crc_needed) && (!verify_crc(sbuf))) {
@@ -304,13 +313,14 @@ class IntergasHeaterMonitor : public PollingComponent {
             TextSensor_publish(heater_last_fault_code, prettify_fault_code(sbuf[29]));
 
             std::string heater_status;
-            switch (sbuf[24]) {
+            unsigned u_heater_status = sbuf[24];
+            switch (u_heater_status) {
             case 51:  heater_status = "Hot water delivery"; break;
             case 0: case 102: heater_status = "Central Heating active"; break;
             case 126: heater_status = "Central Heating idle"; break;
             case 204: heater_status = "Hot water ramp down"; break;
             case 231: heater_status = "Central Heating ramp down"; break;
-            default:  heater_status = "Code: " + esphome::to_string(sbuf[24]); break;
+            default:  heater_status = "Code: " + esphome::to_string(u_heater_status); break;
             }
             TextSensor_publish(heater_status_code, heater_status);
 
@@ -355,6 +365,22 @@ class IntergasHeaterMonitor : public PollingComponent {
             //Sensor_publish(valve_pos, getInt(sbuf[31],  sbuf[30]));
         }
 
+        void process_crc_register(std::string cmd, const std::vector<uint8_t> &sbuf) {
+            log_response(cmd, sbuf);
+            /*
+            Sensor_publish(interrupt_time, float(getInt(sbuf[1], sbuf[0])) / 5.0);
+            Sensor_publish(interrupt_load, float(getInt(sbuf[3], sbuf[2])) / 6.25);
+            Sensor_publish(main_load, float(getInt(sbuf[5], sbuf[4])) / 8.0);
+            int16_t freq_number = getInt(sbuf[7], sbuf[6]);
+            if (freq_number > 0) {
+                Sensor_publish(net_frequency, 2000.0 / float(freq_number));
+            } else {
+                Sensor_publish(net_frequency, float(0));
+            }
+            Sensor_publish(voltage_reference, float(getInt(sbuf[9], sbuf[8])) * 5.0 / 1024.0);
+            */
+        }
+
         void process_rev(std::string cmd, const std::vector<uint8_t> &sbuf) {
             // REV delivers these fields
             // Hardware Release string @ bytes 0-17
@@ -364,14 +390,15 @@ class IntergasHeaterMonitor : public PollingComponent {
             // ROM test 2 checksum @ bytes 28-31
 
             // export the fields from the back to the front of the array
-            TextSensor_publish(rom_test_2_checksum, format_hex_pretty(&sbuf[28], 4).c_str());
-            TextSensor_publish(rom_test_1_checksum, format_hex_pretty(&sbuf[24], 4).c_str());
+            TextSensor_publish(rom_test_2_checksum, format_hex_pretty(sbuf.data() + 28, 4).c_str());
+            TextSensor_publish(rom_test_1_checksum, format_hex_pretty(sbuf.data() + 24, 4).c_str());
 
             // Copy the buffer to a local array such that we can parse the strings.
             char copy[sbuf.size()];
             memcpy(copy, sbuf.data(), sbuf.size());
+
             copy[23] = '\0'; // Cut off SW release
-            TextSensor_publish(software_release, &copy[18]);
+            TextSensor_publish(software_release, copy + 18);
             copy[18] = '\0'; // Cut off HW release
             TextSensor_publish(hardware_release, copy);
         }
@@ -384,15 +411,16 @@ class IntergasHeaterMonitor : public PollingComponent {
             // ROM test 1 checksum @ bytes 24-27
             // ROM test 2 checksum @ bytes 28-31
 
-            // export the fields from the back to the front of the array
-            TextSensor_publish(dsp_rom_test_2_checksum, format_hex_pretty(&sbuf[28], 4).c_str());
-            TextSensor_publish(dsp_rom_test_1_checksum, format_hex_pretty(&sbuf[24], 4).c_str());
-
             // Copy the buffer to a local array such that we can parse the strings.
             char copy[sbuf.size()];
             memcpy(copy, sbuf.data(), sbuf.size());
+
+            // export the fields from the back to the front of the array
+            TextSensor_publish(dsp_rom_test_2_checksum, format_hex_pretty(sbuf.data() + 28, 4).c_str());
+            TextSensor_publish(dsp_rom_test_1_checksum, format_hex_pretty(sbuf.data() + 24, 4).c_str());
+
             copy[23] = '\0'; // Cut off SW release
-            TextSensor_publish(dsp_software_release, &copy[18]);
+            TextSensor_publish(dsp_software_release, copy + 18);
             copy[18] = '\0'; // Cut off HW release
             TextSensor_publish(dsp_hardware_release, copy);
         }
@@ -426,6 +454,40 @@ class IntergasHeaterMonitor : public PollingComponent {
             Sensor_publish(burner_starts_dhw_count, getInt24(sbuf[29], sbuf[27], sbuf[26]));
         }
 
+        void process_params(std::string cmd, const std::vector<uint8_t> &sbuf) {
+            ESP_LOGI(TAG, "heater_on: %i", getSigned(sbuf[0]));
+            ESP_LOGI(TAG, "comfort_mode: %i", getSigned(sbuf[1]));
+            ESP_LOGI(TAG, "ch_set_max: %i", getSigned(sbuf[2]));
+            ESP_LOGI(TAG, "dhw_set: %i", getSigned(sbuf[3]));
+            ESP_LOGI(TAG, "eco_days: %i", getSigned(sbuf[4]));
+            ESP_LOGI(TAG, "comfort_set: %i", getSigned(sbuf[5]));
+            ESP_LOGI(TAG, "dhw_at_night: %i", getSigned(sbuf[6]));
+            ESP_LOGI(TAG, "ch_at_night: %i", getSigned(sbuf[7]));
+            ESP_LOGI(TAG, "param_1: %i", getSigned(sbuf[8]));
+            ESP_LOGI(TAG, "param_2: %i", getSigned(sbuf[9]));
+            ESP_LOGI(TAG, "param_3: %i", getSigned(sbuf[10]));
+            ESP_LOGI(TAG, "param_4: %i", getSigned(sbuf[11]));
+            ESP_LOGI(TAG, "param_5: %i", getSigned(sbuf[12]));
+            ESP_LOGI(TAG, "param_6: %i", getSigned(sbuf[13]));
+            ESP_LOGI(TAG, "param_7: %i", getSigned(sbuf[14]));
+            ESP_LOGI(TAG, "param_8: %i", getSigned(sbuf[15]));
+            ESP_LOGI(TAG, "param_9: %i", getSigned(sbuf[16]));
+            ESP_LOGI(TAG, "param_A: %i", getSigned(sbuf[17]));
+            ESP_LOGI(TAG, "param_b: %i", getSigned(sbuf[18]));
+            ESP_LOGI(TAG, "param_C: %i", getSigned(sbuf[19]));
+            ESP_LOGI(TAG, "param_c: %i", getSigned(sbuf[20]));
+            ESP_LOGI(TAG, "param_d: %i", getSigned(sbuf[21]));
+            ESP_LOGI(TAG, "param_E: %i", getSigned(sbuf[22]));
+            ESP_LOGI(TAG, "param_E.: %i", getSigned(sbuf[23]));
+            ESP_LOGI(TAG, "param_F: %i", getSigned(sbuf[24]));
+            ESP_LOGI(TAG, "param_H: %i", getSigned(sbuf[25]));
+            ESP_LOGI(TAG, "param_n: %i", getSigned(sbuf[26]));
+            ESP_LOGI(TAG, "param_o: %i", getSigned(sbuf[27]));
+            ESP_LOGI(TAG, "param_P: %i", getSigned(sbuf[28]));
+            ESP_LOGI(TAG, "param_r: %i", getSigned(sbuf[29]));
+            ESP_LOGI(TAG, "param_F.: %i", getSigned(sbuf[30]));
+        }
+
         bool get_bit(uint8_t data, int bit) {
             return data & (1 << bit);
         }
@@ -455,14 +517,14 @@ class IntergasHeaterMonitor : public PollingComponent {
         }
 
         int16_t getInt(byte msb, byte lsb) {
-            // Calculate float value from two bytes
+            // Calculate integer value from two bytes
             uint16_t _msb = msb;
             int16_t word = (int16_t)(_msb << 8 | lsb);
             return word;
         }
 
         int32_t getInt24(byte msbh, byte msbl, byte lsb) {
-            // Calculate float value from two bytes
+            // Calculate 24 bit integer value from two bytes
             uint32_t _msbh = msbh;
             uint32_t _msbl = msbl;
             int32_t word = (int32_t)(_msbh << 16 | _msbl << 8 | lsb);
@@ -470,7 +532,7 @@ class IntergasHeaterMonitor : public PollingComponent {
         }
 
         int8_t getSigned(byte lsb) {
-            // Calculate float value from two bytes
+            // Calculate signed value from two bytes
             return (int8_t)lsb;
         }
 
@@ -529,20 +591,19 @@ class IntergasHeaterMonitor : public PollingComponent {
         }
 
         void switch_onboard_led(const bool value) {
-        // Settings for the ESP32 board
-#       ifdef USE_ESP32_FRAMEWORK_ARDUINO
-                BinaryOutput *output = static_cast<BinaryOutput *>(onboard_led);
-                if (value) {
-                    output->turn_on();
-                } else {
-                    output->turn_off();
-                }
-#       endif
+            // Settings for the ESP32 board
+            BinaryOutput *output = static_cast<BinaryOutput *>(onboard_led);
+            if (value) {
+                output->turn_on();
+            } else {
+                output->turn_off();
+            }
         }
 
         std::string prettify_fault_code(uint8_t code) {
             std::string fault_string;
-            switch (code) {
+            unsigned u_code = code;
+            switch (u_code) {
             case 0:  fault_string = "F000 - Sensor defect"; break;
             case 1:  fault_string = "F001 - Temperature too high during central heating demand"; break;
             case 2:  fault_string = "F002 - Temperature too high during domestic hot water (DHW) demand"; break;
@@ -567,7 +628,7 @@ class IntergasHeaterMonitor : public PollingComponent {
             case 30: fault_string = "F030 - Sensor S3 fault"; break;
             case 31: fault_string = "F031 - Sensor fault S1"; break;
             case 0xff: fault_string = "No Fault detected"; break;
-            default: fault_string = "Unspecified fault: " + esphome::to_string(code); break;
+            default: fault_string = "Unspecified fault: " + esphome::to_string(u_code); break;
             }
             return fault_string;
         }

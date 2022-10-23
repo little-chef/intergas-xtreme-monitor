@@ -27,9 +27,8 @@ Prerequisites for the physical connection:
 
 * As opto coupler we use the [4N25](https://www.conrad.nl/p/lite-on-optocoupler-fototransistor-4n25-dip-6-transistor-dc-1127375) type.
 
-* As controller we either use:
+* As controller we use:
   * a [NodeMCU-32s (ESP32)](https://esphome.io/devices/nodemcu_esp32.html) Development board (preferred)
-  * a [NodeMCU v2 Lua ESP-12E (ESP8266)](https://www.nodemcu.com/index_en.html) Wifi development board.
 
 
 # Schematics design
@@ -53,14 +52,10 @@ Here are the installation steps for the software in ESPHome:
   $ cd config
   $ git clone https://github.com/little-chef/intergas-xtreme-monitor.git intergas-xtreme
   $ cd ../esphome
-  $ ln -s ../intergas-xtreme/esphome/IntergasHeaterMonitor.h
-  $ ln -s ../intergas-xtreme/esphome/intergas-xtreme-monitor-base.include
+  $ ln -s ../intergas-xtreme/esphome/IntergasXtremeMonitor.h
 
   # For the NodeMCU-32s board, create this link:
-  $ ln -s ../intergas-xtreme/esphome/intergas-xtreme-monitor-esp32.yaml intergas-heater-monitor.yaml
-
-  # And for the NodeMCU-V2-ESP8266 board, use this link:
-  $ ln -s ../intergas-xtreme/esphome/intergas-xtreme-monitor-esp8266.yaml intergas-heater-monitor.yaml
+  $ ln -s ../intergas-xtreme/esphome/intergas-xtreme-monitor.yaml intergas-xtreme-monitor.yaml
   ```
   Next create the config/secrets.yaml file and add the following lines:
   ```
@@ -87,12 +82,14 @@ The code and content have been inspired by these public sources:
 * https://gathering.tweakers.net/forum/list_messages/2056344
 * https://theintergasshop.co.uk/content/181-intergas-boiler-manuals -> IDS X Range Software
 
-# Limitations of the ESP8266 NodeMCU
-The monitor adds a lot of sensors to the Home-Assistant dashboard while using a ESP8266
-NodeMCU. The ESP8266 may run into some performance issues such that OTA updates go very
-slow, and may result in timeouts on the Wifi connection. In those cases the updates need
-to be done via USB. Runtime though, the ESP8266 will operate reliable and no network
-connection issues are to be epected.
+# Why is the ESP8266 NodeMCU not supported
+The monitor adds a lot of sensors to the Home-Assistant dashboard.
+The ESP8266 will run into memory fragmentation issues that impacts its stability.
+Also, the webserver cannot be enabled and OTA updates go very slow and will result
+in timeouts on the Wifi connection. Frequently updates need to be done via USB due
+to all failures. Furthermore, the amount of UARTs are limited in the ESP8266, and
+some port and pin swapping is required to prevent polluting the data flow towards
+caused by the bootlogging of the ESP8266.
 The more powerful ESP32 does not show these kind of issues, and is therefor preferred.
 
 # Final Note:
