@@ -179,6 +179,8 @@ class IntergasXtremeMonitor : public PollingComponent {
 
         bool verify_crc(std::vector<uint8_t> &byte_array) {
             uint8_t crc = 0;
+            // Parse the whole byte_array, except last value as that contains
+            // the expected CRC value.
             for (int i = 0; i < byte_array.size() - 1; i++) {
                 crc ^= byte_array[i];
             }
@@ -215,7 +217,7 @@ class IntergasXtremeMonitor : public PollingComponent {
 
         ControlState state_parse_respond() {
             TextSensor_publish(monitor_status, "Processing...");
-            ControlState next_state = SEND_NEXT_COMMAND;
+            ControlState set_next_state = SEND_NEXT_COMMAND;
             ids_command *ids_cmd = current_command;
 
             size_t len = Serial2.available();
@@ -228,7 +230,7 @@ class IntergasXtremeMonitor : public PollingComponent {
                     ESP_LOGE(TAG, "Invalid status response received. Not enough data");
                 }
                 switch_onboard_led(false);
-                return next_state;
+                return set_next_state;
             }
 
             std::vector<uint8_t> sbuf(len);
@@ -242,14 +244,14 @@ class IntergasXtremeMonitor : public PollingComponent {
                     get_log_cmd(ids_cmd->cmd).c_str(),
                     format_hex_pretty(sbuf.data(), len).c_str());
                 switch_onboard_led(false);
-                return next_state;
+                return set_next_state;
             }
 
             // Call the function pointer
             cmd_fptr f = ids_cmd->data_handler;
             (this->*f)(ids_cmd->cmd, sbuf);
             switch_onboard_led(false);
-            return next_state;
+            return set_next_state;
         }
 
         ControlState state_stopped() {
@@ -532,7 +534,7 @@ class IntergasXtremeMonitor : public PollingComponent {
         }
 
         int8_t getSigned(byte lsb) {
-            // Calculate signed value from two bytes
+            // Calculate signed value from one byte
             return (int8_t)lsb;
         }
 
@@ -601,35 +603,33 @@ class IntergasXtremeMonitor : public PollingComponent {
         }
 
         std::string prettify_fault_code(uint8_t code) {
-            std::string fault_string;
             unsigned u_code = code;
             switch (u_code) {
-            case 0:  fault_string = "F000 - Sensor defect"; break;
-            case 1:  fault_string = "F001 - Temperature too high during central heating demand"; break;
-            case 2:  fault_string = "F002 - Temperature too high during domestic hot water (DHW) demand"; break;
-            case 3:  fault_string = "F003 - Flue gas temperature too high"; break;
-            case 4:  fault_string = "F004 - No flame during startup"; break;
-            case 5:  fault_string = "F005 - Flame disappears during operation"; break;
-            case 6:  fault_string = "F006 - Flame simulation error"; break;
-            case 7:  fault_string = "F007 - No or insufficient ionisation flow"; break;
-            case 8:  fault_string = "F008 - Fan speed incorrect"; break;
-            case 9:  fault_string = "F009 - Burner controller has internal fault"; break;
-            case 10: fault_string = "F010 - Sensor fault"; break;
-            case 11: fault_string = "F011 - Sensor fault"; break;
-            case 12: fault_string = "F012 - Sensor 5 fault"; break;
-            case 14: fault_string = "F014 - Mounting fault sensor"; break;
-            case 15: fault_string = "F015 - Mounting fault sensor S1"; break;
-            case 16: fault_string = "F016 - Mounting fault S3"; break;
-            case 18: fault_string = "F018 - Flue and/or air supply duct is blocked"; break;
-            case 19: fault_string = "F019 - BMM error"; break;
-            case 27: fault_string = "F027 - Short circuit of outdoor"; break;
-            case 28: fault_string = "F028 - Reset error"; break;
-            case 29: fault_string = "F029 - Gas valve error"; break;
-            case 30: fault_string = "F030 - Sensor S3 fault"; break;
-            case 31: fault_string = "F031 - Sensor fault S1"; break;
-            case 0xff: fault_string = "No Fault detected"; break;
-            default: fault_string = "Unspecified fault: " + esphome::to_string(u_code); break;
+            case 0:  return "F000 - Sensor defect";
+            case 1:  return "F001 - Temperature too high during central heating demand";
+            case 2:  return "F002 - Temperature too high during domestic hot water (DHW) demand";
+            case 3:  return "F003 - Flue gas temperature too high";
+            case 4:  return "F004 - No flame during startup";
+            case 5:  return "F005 - Flame disappears during operation";
+            case 6:  return "F006 - Flame simulation error";
+            case 7:  return "F007 - No or insufficient ionisation flow";
+            case 8:  return "F008 - Fan speed incorrect";
+            case 9:  return "F009 - Burner controller has internal fault";
+            case 10: return "F010 - Sensor fault";
+            case 11: return "F011 - Sensor fault";
+            case 12: return "F012 - Sensor 5 fault";
+            case 14: return "F014 - Mounting fault sensor";
+            case 15: return "F015 - Mounting fault sensor S1";
+            case 16: return "F016 - Mounting fault S3";
+            case 18: return "F018 - Flue and/or air supply duct is blocked";
+            case 19: return "F019 - BMM error";
+            case 27: return "F027 - Short circuit of outdoor";
+            case 28: return "F028 - Reset error";
+            case 29: return "F029 - Gas valve error";
+            case 30: return "F030 - Sensor S3 fault";
+            case 31: return "F031 - Sensor fault S1";
+            case 0xff: return "No Fault detected";
+            default: return "Unspecified fault: " + esphome::to_string(u_code);
             }
-            return fault_string;
         }
 };
