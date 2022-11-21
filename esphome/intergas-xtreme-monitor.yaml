@@ -503,6 +503,49 @@ text_sensor:
     id: monitor_status
     icon: "mdi:text-box"
 
+number:
+  - platform: template
+    name: Max Heating Power (P010)
+    id: max_heating_power
+    entity_category: config
+    min_value: 25
+    max_value: 100
+    step: 5
+    icon: "mdi:gas-burner"
+    unit_of_measurement: '%'
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(10, x);
+
+  - platform: template
+    name: HT Zone Max Temperature (P050)
+    id: ht_zone_setpoint_max
+    entity_category: config
+    min_value: 20
+    max_value: 90
+    step: 1
+    icon: "mdi:coolant-temperature"
+    unit_of_measurement: °C
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(50, x);
+
+  - platform: template
+    name: LT Zone Max Temperature (P060)
+    id: lt_zone_setpoint_max
+    entity_category: config
+    min_value: 20
+    max_value: 90
+    step: 1
+    icon: "mdi:coolant-temperature"
+    unit_of_measurement: °C
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(60, x);
+
 custom_component:
   - lambda: |-
       return {new IntergasXtremeMonitor()};

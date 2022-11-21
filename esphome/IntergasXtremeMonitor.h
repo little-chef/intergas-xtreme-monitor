@@ -12,13 +12,25 @@ class IntergasXtremeMonitor : public PollingComponent {
             next_state = STOPPED;
         }
 
+        void set_param(uint8_t param, float value) {
+            std::string reg = "V" + esphome::to_string(param/32) + "\r";
+            store_parameter(param, static_cast<uint8_t>(value), reg);
+        }
+
     private:
+        const std::vector<int> list_xtreme_parameters{
+                1,  2,  9, 10, 11, 12, 30, 31, 32, 33, 34, 35, 36,
+                37, 50, 51, 52, 53, 56, 57, 59, 60, 70, 71, 72, 73,
+                74, 75, 76, 77, 81, 86, 90, 91, 97, 100, 101
+        };
+
         enum ControlState {
             PRE_INIT,
             INIT,
             WAIT_CONNECTED,
             SEND_NEXT_COMMAND,
-            PARSE_RESPONSE,
+            PARSE_READ_RESPONSE,
+            PARSE_WRITE_RESPONSE,
             STOPPED,
             FAILURE
         };
@@ -26,6 +38,17 @@ class IntergasXtremeMonitor : public PollingComponent {
 
         typedef void (IntergasXtremeMonitor::*cmd_fptr)(std::string,
                                                         const std::vector<uint8_t> &);
+
+        // Data structure for data store-commands to send to the boiler. Typically
+        // used for setting a specific parameter from ESP-home UI, like water
+        // or heater temperatures. Those commands are queued in this queue to
+        // be picked up later by the state machine to make sure to process them
+        // in the proper sequence.
+        struct store_command {
+            std::string refresh_cmd;            // The command to run to refresh the values on the UI.
+            std::vector<uint8_t> cmd_sequence;  // Command sequence to run
+        };
+        std::vector<store_command> store_commands = {};
 
         struct ids_command {
             std::string cmd;        // The command to send to the central heater.
@@ -59,10 +82,10 @@ class IntergasXtremeMonitor : public PollingComponent {
             { "E0\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
             { "G1\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
             { "B1\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
-            { "V0\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
-            { "V1\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
-            { "V2\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
-            { "V3\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
+            { "V0\r", true,  32, &IntergasXtremeMonitor::export_settings_v0,   3600, 0 },
+            { "V1\r", true,  32, &IntergasXtremeMonitor::export_settings_v1,   3600, 0 },
+            { "V2\r", true,  32, &IntergasXtremeMonitor::export_settings_v2,   3600, 0 },
+            { "V3\r", true,  32, &IntergasXtremeMonitor::export_settings_v3,   3600, 0 },
             { "V4\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
             { "V5\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
             { "V6\r", true,  32, &IntergasXtremeMonitor::log_response,         3600, 0 },
@@ -126,6 +149,24 @@ class IntergasXtremeMonitor : public PollingComponent {
             return next;
         }
 
+        ids_command *get_command(std::string cmd) {
+            for (auto & ids_cmd : ids_commands) {
+                if (ids_cmd.cmd == cmd) {
+                    return &ids_cmd;
+                }
+            }
+            return nullptr;
+        }
+
+        void force_refresh_cmd(std::string cmd) {
+            ids_command * ids_cmd = get_command(cmd);
+            if (!ids_cmd) {
+                ESP_LOGE(TAG, "Command %s does not exist", cmd.c_str());
+            } else {
+                ids_cmd->last_run = 0; // Force the last run to be outdated.
+            }
+        }
+
         // Print a banner with library information.
         void banner() {
             ESP_LOGI(TAG, "ESPHome Intergas Xtreme IDS Monitor");
@@ -149,13 +190,14 @@ class IntergasXtremeMonitor : public PollingComponent {
         // a good minimal the central heater can respond within.
         void update() override {
             switch (next_state) {
-            case PRE_INIT:          next_state = state_pre_init();          break;
-            case INIT:              next_state = state_init();              break;
-            case WAIT_CONNECTED:    next_state = state_wait_connected();    break;
-            case SEND_NEXT_COMMAND: next_state = state_send_next_command(); break;
-            case PARSE_RESPONSE:    next_state = state_parse_respond();     break;
-            case STOPPED:           next_state = state_stopped();           break;
-            case FAILURE:           next_state = state_failed();            break;
+            case PRE_INIT:              next_state = state_pre_init();              break;
+            case INIT:                  next_state = state_init();                  break;
+            case WAIT_CONNECTED:        next_state = state_wait_connected();        break;
+            case SEND_NEXT_COMMAND:     next_state = state_send_next_command();     break;
+            case PARSE_READ_RESPONSE:   next_state = state_parse_read_respond();    break;
+            case PARSE_WRITE_RESPONSE:  next_state = state_parse_write_response();  break;
+            case STOPPED:               next_state = state_stopped();               break;
+            case FAILURE:               next_state = state_failed();                break;
             }
         }
 
@@ -187,6 +229,17 @@ class IntergasXtremeMonitor : public PollingComponent {
             return crc == byte_array.back();
         }
 
+        std::vector<uint8_t> append_command_crc(const std::vector<uint8_t> &byte_array) {
+            uint8_t crc = 0;
+            std::vector<uint8_t> sbuf = byte_array;
+
+            for (uint8_t a_byte : sbuf) {
+                crc ^= a_byte;
+            }
+            sbuf.push_back(crc);
+            return sbuf;
+        }
+
         std::string add_command_crc(const std::string &cmd) {
             uint8_t crc = 0;
             for (std::string::size_type i = 0; i < cmd.size(); i++) {
@@ -196,6 +249,15 @@ class IntergasXtremeMonitor : public PollingComponent {
         }
 
         ControlState state_send_next_command() {
+            // Storing new settings always has highest priorities above
+            // regular updates.
+            if (store_commands.size()) {
+                return send_write_command();
+            }
+            return send_read_command();
+        }
+
+        ControlState send_read_command() {
             ids_command *ids_cmd = fetch_next_command();
             if (!ids_cmd) {
                 // No command to schedule.
@@ -212,10 +274,10 @@ class IntergasXtremeMonitor : public PollingComponent {
             } else {
                 Serial2.write(ids_cmd->cmd.c_str());
             }
-            return PARSE_RESPONSE;
+            return PARSE_READ_RESPONSE;
         }
 
-        ControlState state_parse_respond() {
+        ControlState state_parse_read_respond() {
             TextSensor_publish(monitor_status, "Processing...");
             ControlState set_next_state = SEND_NEXT_COMMAND;
             ids_command *ids_cmd = current_command;
@@ -265,6 +327,60 @@ class IntergasXtremeMonitor : public PollingComponent {
             return FAILURE;
         }
 
+        ControlState send_write_command() {
+            TextSensor_publish(monitor_status, "Write setting");
+            switch_onboard_led(true);
+
+            store_command pcmd = *(store_commands.begin());
+
+            ESP_LOGI(TAG, "Write parameter via command: %s, len: %d",
+                format_hex_pretty(pcmd.cmd_sequence.data(), pcmd.cmd_sequence.size()).c_str(),
+                pcmd.cmd_sequence.size());
+
+            Serial2.write(pcmd.cmd_sequence.data(), pcmd.cmd_sequence.size());
+
+            force_refresh_cmd(pcmd.refresh_cmd);
+
+            return PARSE_WRITE_RESPONSE;
+        }
+
+        ControlState state_parse_write_response() {
+            TextSensor_publish(monitor_status, "Processing write");
+
+            store_command pcmd = *(store_commands.begin());
+
+            ESP_LOGI(TAG, "Parsing response for store command: %s, len: %d",
+                format_hex_pretty(pcmd.cmd_sequence.data(), pcmd.cmd_sequence.size()).c_str(),
+                pcmd.cmd_sequence.size());
+
+            size_t len = Serial2.available();
+            if (len) {
+                std::vector<uint8_t> sbuf(len);
+                Serial2.readBytes(sbuf.data(), len);
+
+                ESP_LOGI(TAG, "Store response: %s",
+                    format_hex_pretty(sbuf.data(), sbuf.size()).c_str());
+            } else{
+                    ESP_LOGE(TAG, "No response received");
+            }
+
+            // Erase the command from the queue that e just finished processing
+            store_commands.erase(store_commands.begin());
+
+            switch_onboard_led(false);
+            return SEND_NEXT_COMMAND;
+        }
+
+        void store_parameter(uint8_t param_number, uint8_t value, std::string refresh_cmd) {
+            std::vector<uint8_t> sbuf{ 'P', param_number, value };
+            sbuf = append_command_crc(sbuf);
+            store_command pcmd;
+            pcmd.refresh_cmd = refresh_cmd;
+            pcmd.cmd_sequence = sbuf;
+            store_commands.push_back(pcmd);
+            ESP_LOGI(TAG, "Storing parameter P%03d value: %d", param_number, value);
+        }
+
         std::string get_log_cmd(std::string cmd) {
             std::string repl = "\r";
             size_t i = cmd.find(repl);
@@ -278,6 +394,46 @@ class IntergasXtremeMonitor : public PollingComponent {
             ESP_LOGI(TAG, "Response %s Data: %s",
                 get_log_cmd(cmd).c_str(),
                 format_hex_pretty(sbuf.data(), sbuf.size()).c_str());
+        }
+
+        void export_settings(int register_base, std::string cmd, const std::vector<uint8_t> &sbuf) {
+            for (int i = 0; i < sbuf.size() - 1; i++) {
+                int parameter_id = (register_base * 32) + i;
+
+                switch(parameter_id) {
+                    case 10:
+                        Number_publish(max_heating_power, getSigned(sbuf[i]));
+                        break;
+                    case 50:
+                        Number_publish(ht_zone_setpoint_max, getSigned(sbuf[i]));
+                        break;
+                    case 60:
+                        Number_publish(lt_zone_setpoint_max, getSigned(sbuf[i]));
+                        break;
+                    default:
+                        // Check if the parameter is a known value, if not ignore it.
+                        if (std::find(
+                                list_xtreme_parameters.begin(),
+                                list_xtreme_parameters.end(),
+                                parameter_id) != list_xtreme_parameters.end()) {
+                            ESP_LOGI(TAG, "Parameter P%03d has value: %d",
+                                parameter_id, getSigned(sbuf[i]));
+                        }
+                }
+            }
+        }
+
+        void export_settings_v0(std::string cmd, const std::vector<uint8_t> &sbuf) {
+            export_settings(0, cmd, sbuf);
+        }
+        void export_settings_v1(std::string cmd, const std::vector<uint8_t> &sbuf) {
+            export_settings(1, cmd, sbuf);
+        }
+        void export_settings_v2(std::string cmd, const std::vector<uint8_t> &sbuf) {
+            export_settings(2, cmd, sbuf);
+        }
+        void export_settings_v3(std::string cmd, const std::vector<uint8_t> &sbuf) {
+            export_settings(3, cmd, sbuf);
         }
 
         void process_status(std::string cmd, const std::vector<uint8_t> &sbuf) {
@@ -565,6 +721,10 @@ class IntergasXtremeMonitor : public PollingComponent {
         }
 
         template <typename V> void Sensor_publish(Sensor *sensor, V value) {
+            publish_state(sensor, value);
+        }
+
+        template <typename V> void Number_publish(Number *sensor, V value) {
             publish_state(sensor, value);
         }
 
