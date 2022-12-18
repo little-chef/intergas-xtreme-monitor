@@ -519,6 +519,20 @@ number:
             static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(10, x);
 
   - platform: template
+    name: Min Heating Power (P011)
+    id: min_heating_power
+    entity_category: config
+    min_value: 1
+    max_value: 100
+    step: 1
+    icon: "mdi:gas-burner"
+    unit_of_measurement: '%'
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(11, x);
+
+  - platform: template
     name: HT Zone Max Temperature (P050)
     id: ht_zone_setpoint_max
     entity_category: config
@@ -545,6 +559,48 @@ number:
       then:
         - lambda: |-
             static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(60, x);
+
+  - platform: template
+    name: Max Domestic Water Heating Power (P070)
+    id: max_water_heating_power
+    entity_category: config
+    min_value: 20
+    max_value: 100
+    step: 5
+    icon: "mdi:gas-burner"
+    unit_of_measurement: '%'
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(70, x);
+
+  - platform: template
+    name: Min Domestic Water Heating Power (P071)
+    id: min_water_heating_power
+    entity_category: config
+    min_value: 1
+    max_value: 100
+    step: 1
+    icon: "mdi:gas-burner"
+    unit_of_measurement: '%'
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(71, x);
+
+  - platform: template
+    name: Number of ECO days (P074)
+    id: nof_eco_days
+    entity_category: config
+    min_value: 0
+    max_value: 10
+    step: 1
+    icon: "mdi:calendar-today"
+    unit_of_measurement: 'days'
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(74, x);
 
 custom_component:
   - lambda: |-

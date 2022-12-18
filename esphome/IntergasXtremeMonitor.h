@@ -405,11 +405,23 @@ class IntergasXtremeMonitor : public PollingComponent {
                     case 10:
                         Number_publish(max_heating_power, getSigned(sbuf[i]));
                         break;
+                    case 11:
+                        Number_publish(min_heating_power, getSigned(sbuf[i]));
+                        break;
                     case 50:
                         Number_publish(ht_zone_setpoint_max, getSigned(sbuf[i]));
                         break;
                     case 60:
                         Number_publish(lt_zone_setpoint_max, getSigned(sbuf[i]));
+                        break;
+                    case 70:
+                        Number_publish(max_water_heating_power, getSigned(sbuf[i]));
+                        break;
+                    case 71:
+                        Number_publish(min_water_heating_power, getSigned(sbuf[i]));
+                        break;                        
+                    case 74:
+                        Number_publish(nof_eco_days, getSigned(sbuf[i]));
                         break;
                     default:
                         // Check if the parameter is a known value, if not ignore it.
