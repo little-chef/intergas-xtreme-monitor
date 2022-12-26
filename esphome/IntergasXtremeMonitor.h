@@ -281,6 +281,7 @@ class IntergasXtremeMonitor : public PollingComponent {
         }
 
         void process_status(std::string cmd, const std::vector<uint8_t> &sbuf) {
+            log_response(cmd, sbuf);
             // Retrieve the variables from the message
             double ch_pressure;
             bool ch_has_pressure_sensor;
@@ -346,6 +347,7 @@ class IntergasXtremeMonitor : public PollingComponent {
         }
 
         void process_status_extra(std::string cmd, const std::vector<uint8_t> &sbuf) {
+            log_response(cmd, sbuf);
             Sensor_publish(tapflow, getFloat(sbuf[1], sbuf[0]));
             Sensor_publish(zone1_room_override, getFloat(sbuf[5], sbuf[4]));
             Sensor_publish(zone1_room_setpoint, getTemp(sbuf[7], sbuf[6]));
@@ -357,6 +359,7 @@ class IntergasXtremeMonitor : public PollingComponent {
         }
 
         void process_status_extra_2(std::string cmd, const std::vector<uint8_t> &sbuf) {
+            log_response(cmd, sbuf);
             Sensor_publish(fanspeed_set, getInt(sbuf[1],  sbuf[0]));
             Sensor_publish(fanspeed, getInt(sbuf[3],  sbuf[2]));
             Sensor_publish(pumpspeed_set, getInt(sbuf[11],  sbuf[10]));
@@ -384,6 +387,7 @@ class IntergasXtremeMonitor : public PollingComponent {
         }
 
         void process_rev(std::string cmd, const std::vector<uint8_t> &sbuf) {
+            log_response(cmd, sbuf);
             // REV delivers these fields
             // Hardware Release string @ bytes 0-17
             // Software release string @ bytes 18-22
@@ -406,6 +410,7 @@ class IntergasXtremeMonitor : public PollingComponent {
         }
 
         void process_rew(std::string cmd, const std::vector<uint8_t> &sbuf) {
+            log_response(cmd, sbuf);
             // REW delivers these fields for the DSP
             // Hardware Release string @ bytes 0-17
             // Software release string @ bytes 18-22
@@ -428,6 +433,7 @@ class IntergasXtremeMonitor : public PollingComponent {
         }
 
         void process_prod_code(std::string cmd, const std::vector<uint8_t> &sbuf) {
+            log_response(cmd, sbuf);
             // B?\R delivers 32 bytes of data where only the bytes 25-31 contain valid data
             // Each hex value is converted to decimal and appended to the string representing
             // the whole production code. it is not a regular 7 byte hex value.
@@ -442,6 +448,7 @@ class IntergasXtremeMonitor : public PollingComponent {
         }
 
         void process_runtime_stats(std::string cmd, const std::vector<uint8_t> &sbuf) {
+            log_response(cmd, sbuf);
             Sensor_publish(line_power_connected_hours, getInt24(sbuf[30], sbuf[1], sbuf[0]));
             Sensor_publish(line_power_connected_count, getInt(sbuf[3], sbuf[2]));
             Sensor_publish(ch_function_hours, getInt(sbuf[5], sbuf[4]));
@@ -457,6 +464,7 @@ class IntergasXtremeMonitor : public PollingComponent {
         }
 
         void process_params(std::string cmd, const std::vector<uint8_t> &sbuf) {
+            log_response(cmd, sbuf);
             ESP_LOGI(TAG, "heater_on: %i", getSigned(sbuf[0]));
             ESP_LOGI(TAG, "comfort_mode: %i", getSigned(sbuf[1]));
             ESP_LOGI(TAG, "ch_set_max: %i", getSigned(sbuf[2]));
