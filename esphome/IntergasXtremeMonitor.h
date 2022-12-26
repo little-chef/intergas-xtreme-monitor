@@ -261,13 +261,15 @@ class IntergasXtremeMonitor : public PollingComponent {
             ids_command *ids_cmd = fetch_next_command();
             if (!ids_cmd) {
                 // No command to schedule.
+                ESP_LOGI(TAG, "Monitor Idle");
                 return SEND_NEXT_COMMAND;
             }
+            TextSensor_publish(monitor_status, "Operational");
+
             current_command = ids_cmd;
             switch_onboard_led(true);
 
             std::string log_cmd = get_log_cmd(ids_cmd->cmd);
-            TextSensor_publish(monitor_status, (std::string("Fetching: " + log_cmd)).c_str());
             ESP_LOGD(TAG, "Send command %s", log_cmd.c_str());
             if (ids_cmd->crc_needed) {
                 Serial2.write(add_command_crc(ids_cmd->cmd).c_str());
@@ -278,7 +280,6 @@ class IntergasXtremeMonitor : public PollingComponent {
         }
 
         ControlState state_parse_read_respond() {
-            TextSensor_publish(monitor_status, "Processing...");
             ControlState set_next_state = SEND_NEXT_COMMAND;
             ids_command *ids_cmd = current_command;
 
