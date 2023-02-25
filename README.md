@@ -59,12 +59,13 @@ Here are the installation steps for the software in ESPHome:
   ```
   Next create the config/secrets.yaml file and add the following lines:
   ```
-  esphome_hassio_api_pw: my-very-secure-api-pw
+  esphome_hassio_api_encryption_key: my-32-byte-base64-encryption-key
   esphome_hassio_ota_pw: my-very-secure-ota-pw
   esphome_wifi_network_ssid: my-wifi-access-point
   esphome_wifi_network_password: my-wifi-password
   esphome_wifi_ap_fallback_password: my-fallback-password
   ```
+  The api_encryption key is explained here: https://esphome.io/components/api.html?highlight=randomly%20generated
 
 * Go to the ESPHome dashboard on Home Assistant, the new device should be visible. From
   here you can compile the firmware for the NodeMCU, and install it to NodeMCU device.

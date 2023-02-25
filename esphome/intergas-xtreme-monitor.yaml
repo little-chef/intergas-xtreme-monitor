@@ -60,7 +60,8 @@ captive_portal:
 
 # Enable Home Assistant API
 api:
-  password: !secret esphome_hassio_api_pw
+  encryption:
+    key: !secret esphome_hassio_api_encryption_key
 
 ota:
   safe_mode: True
