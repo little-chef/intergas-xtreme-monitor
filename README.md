@@ -50,12 +50,8 @@ Here are the installation steps for the software in ESPHome:
 * Open an SSH session to your Home-Assistant instance, then
   ```
   $ cd config
-  $ git clone https://github.com/little-chef/intergas-xtreme-monitor.git intergas-xtreme
-  $ cd ../esphome
-  $ ln -s ../intergas-xtreme/esphome/IntergasXtremeMonitor.h
-
-  # For the NodeMCU-32s board, create this link:
-  $ ln -s ../intergas-xtreme/esphome/intergas-xtreme-monitor.yaml intergas-xtreme-monitor.yaml
+  $ git clone https://github.com/little-chef/intergas-xtreme-monitor.git esphome/intergas-xtreme
+  $ echo '<<: !include intergas-xtreme/esphome/intergas-xtreme-monitor.yaml' > esphome/intergas-xtreme-monitor.yaml
   ```
   Next create the config/secrets.yaml file and add the following lines:
   ```

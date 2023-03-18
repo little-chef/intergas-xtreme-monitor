@@ -44,7 +44,7 @@ dallas:
 esphome:
   name: ${devicename}
   includes:
-    - IntergasXtremeMonitor.h
+    - intergas-xtreme/esphome/IntergasXtremeMonitor.h
 
 wifi:
   networks:
