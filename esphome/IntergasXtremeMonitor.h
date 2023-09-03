@@ -17,11 +17,22 @@ class IntergasXtremeMonitor : public PollingComponent {
             store_parameter(param, static_cast<uint8_t>(value), reg);
         }
 
+        void set_select_param(uint8_t param, Select *select, const char* text_value) {
+            auto index = select->index_of(text_value);
+            if (index.has_value()) {
+                set_param(param, index.value());
+            } else {
+                ESP_LOGE("main", "There is no option '%s' for param %d", text_value, param);
+            }
+        }
+
+
     private:
         const std::vector<int> list_xtreme_parameters{
                 1,  2,  9, 10, 11, 12, 30, 31, 32, 33, 34, 35, 36,
-                37, 50, 51, 52, 53, 56, 57, 59, 60, 70, 71, 72, 73,
-                74, 75, 76, 77, 81, 86, 90, 91, 97, 100, 101
+                37, 38, 39, 40, 50, 51, 52, 53, 56, 57, 59, 60,
+                70, 71, 72, 73, 74, 75, 76, 77, 78, 81, 85, 86, 87,
+                90, 91, 97, 100, 101, 104
         };
 
         enum ControlState {
@@ -402,14 +413,77 @@ class IntergasXtremeMonitor : public PollingComponent {
                 int parameter_id = (register_base * 32) + i;
 
                 switch(parameter_id) {
+                    case 1:
+                        Select_publish(installation_type, getSigned(sbuf[i]));
+                        break;
+                    case 2:
+                        Select_publish(display_option, getSigned(sbuf[i]));
+                        break;
+                    case 9:
+                        Number_publish(load_adjustment, getSigned(sbuf[i]));
+                        break;
                     case 10:
                         Number_publish(max_heating_power, getSigned(sbuf[i]));
                         break;
                     case 11:
                         Number_publish(min_heating_power, getSigned(sbuf[i]));
                         break;
+                    case 12:
+                        Number_publish(start_rpm_heating, getSigned(sbuf[i]));
+                        break;
+                    case 30:
+                        Select_publish(pump_setting, getSigned(sbuf[i]));
+                        break;
+                    case 31:
+                        Number_publish(pump_maximum, getSigned(sbuf[i]));
+                        break;
+                    case 32:
+                        Number_publish(pump_minimum, getSigned(sbuf[i]));
+                        break;
+                    case 33:
+                        Number_publish(pump_afterrun_central_heating, getSigned(sbuf[i]));
+                        break;
+                    case 34:
+                        Number_publish(pump_afterrun_boiler, getSigned(sbuf[i]));
+                        break;
+                    case 35:
+                        Select_publish(step_modulation, getSigned(sbuf[i]));
+                        break;
+                    case 36:
+                        Number_publish(anti_pendulum_time_heating, getSigned(sbuf[i]));
+                        break;
+                    case 37:
+                        Number_publish(wait_time_heating_response, getSigned(sbuf[i]));
+                        break;
+                    case 38:
+                        Select_publish(summer_winter_setting, getSigned(sbuf[i]));
+                        break;
+                    case 39:
+                        Select_publish(summer_winter_setting_user, getSigned(sbuf[i]));
+                        break;
+                    case 40:
+                        Select_publish(activate_clock_program_ch, getSigned(sbuf[i]));
+                        break;
                     case 50:
-                        Number_publish(ht_zone_setpoint_max, getSigned(sbuf[i]));
+                        Number_publish(delivery_temperature_control_panel, getSigned(sbuf[i]));
+                        break;
+                    case 51:
+                        Number_publish(heatcurve_minimal_delivery_temperature, getSigned(sbuf[i]));
+                        break;
+                    case 52:
+                        Number_publish(heatcurve_minimal_outside_temperature, getSigned(sbuf[i]));
+                        break;
+                    case 53:
+                        Number_publish(heatcurve_maximal_outside_temperature, getSigned(sbuf[i]));
+                        break;
+                    case 56:
+                        Number_publish(min_heating_delivery_temp_ot_and_rf, getSigned(sbuf[i]));
+                        break;
+                    case 57:
+                        Select_publish(response_OT_and_RF_thermostat, getSigned(sbuf[i]));
+                        break;
+                    case 59:
+                        Number_publish(max_setting_p050, getSigned(sbuf[i]));
                         break;
                     case 60:
                         Number_publish(lt_zone_setpoint_max, getSigned(sbuf[i]));
@@ -419,9 +493,60 @@ class IntergasXtremeMonitor : public PollingComponent {
                         break;
                     case 71:
                         Number_publish(min_water_heating_power, getSigned(sbuf[i]));
-                        break;                        
+                        break;
+                    case 72:
+                        Number_publish(start_speed_hot_water, getSigned(sbuf[i]));
+                        break;
+                    case 73:
+                        Number_publish(comfort_keep_temperature, getSigned(sbuf[i]));
+                        break;
                     case 74:
                         Number_publish(nof_eco_days, getSigned(sbuf[i]));
+                        break;
+                    case 75:
+                        Number_publish(control_temperature_boiler_operation, getSigned(sbuf[i]));
+                        break;
+                    case 76:
+                        Select_publish(hot_water_comfort_setting, getSigned(sbuf[i]));
+                        break;
+                    case 77:
+                        Number_publish(wait_time_heating_after_hot_water_delivery, getSigned(sbuf[i]));
+                        break;
+                    case 78:
+                        Number_publish(dhw_temp_setting, getSigned(sbuf[i]));
+                        break;
+                    case 81:
+                        Select_publish(operation_mode_3_way_valve, getSigned(sbuf[i]));
+                        break;
+                    case 85:
+                        Select_publish(legionella_protection, getSigned(sbuf[i]));
+                        break;
+                    case 86:
+                        Number_publish(comfort_offset, getSigned(sbuf[i]));
+                        break;
+                    case 87:
+                        Select_publish(dhw_timer, getSigned(sbuf[i]));
+                        break;
+                    case 90:
+                        Select_publish(function_relay_re1, getSigned(sbuf[i]));
+                        break;
+                    case 91:
+                        Select_publish(function_relay_re2, getSigned(sbuf[i]));
+                        break;
+                    case 97:
+                        Select_publish(function_alarm_relay, getSigned(sbuf[i]));
+                        break;
+                    case 100:
+                        Select_publish(function_ext1_temp_input, getSigned(sbuf[i]));
+                        break;
+                    case 101:
+                        Select_publish(function_ext2_temp_input, getSigned(sbuf[i]));
+                        break;
+                    case 104:
+                        Select_publish(function_x10_output, getSigned(sbuf[i]));
+                        break;
+                    case 255:
+                        Select_publish(factory_reset, getSigned(sbuf[i]));
                         break;
                     default:
                         // Check if the parameter is a known value, if not ignore it.
@@ -739,6 +864,20 @@ class IntergasXtremeMonitor : public PollingComponent {
 
         template <typename V> void Number_publish(Number *sensor, V value) {
             publish_state(sensor, value);
+        }
+        template <typename V> void Select_publish(Select *sensor, V value) {
+            auto option = sensor->at(value);
+            if (option.has_value()) {
+                publish_state(sensor, option.value());
+            } else {
+                ESP_LOGE("main", "Value %d does not exist, dumping options:", value);
+                for (size_t i = 0; i < sensor->size(); i++) {
+                    auto option = sensor->at(i);
+                    if (option.has_value()) {
+                        ESP_LOGE("main", "Entry %d contains '%s'", i, option.value().c_str());
+                    }
+                }
+            }
         }
 
         // Send the value to Home-assistant, but only do that if the value

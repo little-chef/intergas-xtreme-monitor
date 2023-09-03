@@ -504,9 +504,304 @@ text_sensor:
     id: monitor_status
     icon: "mdi:text-box"
 
+select:
+  - platform: template
+    name: 'P001: Installation Type'
+    id: installation_type
+    options:
+      - "0 = Xtreme Combi"
+      - "1 = Xtreme Solo + Boiler"
+      - "2 = Xtreme Tap"
+      - "3 = Xtreme Solo"
+    entity_category: config
+    icon: "mdi:format-list-bulleted"
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_select_param(1, id(installation_type), x.c_str());
+
+  - platform: template
+    name: 'P002: Display Option'
+    id: display_option
+    options:
+      - "0 = Flame on only"
+      - "1 = Flame on & demand symbol"
+      - "2 = Flame on, demand symbol & sequence code"
+    entity_category: config
+    icon: "mdi:format-list-bulleted"
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_select_param(2, id(display_option), x.c_str());
+
+  - platform: template
+    name: 'P030: Central heating (CH) pump setting'
+    id: pump_setting
+    options:
+      - "0 = Pump overrun active"
+      - "1 = Pump continuous (DHW function off)"
+      - "2 = Active with switch"
+      - "3 = Unknown"
+    entity_category: config
+    icon: "mdi:pump"
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_select_param(30, id(pump_setting), x.c_str());
+
+  - platform: template
+    name: 'P035: Pump step modulation'
+    id: step_modulation
+    options:
+      - "0 = Off"
+      - "1 = On"
+    entity_category: config
+    icon: "mdi:sine-wave"
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_select_param(35, id(step_modulation), x.c_str());
+
+  - platform: template
+    name: 'P038: Summer / Winter setting'
+    id: summer_winter_setting
+    options:
+      - "0 = Inactive"
+      - "1 = Active (Only if P039 = 0)"
+    entity_category: config
+    icon: "mdi:electric-switch"
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_select_param(38, id(summer_winter_setting), x.c_str());
+
+  - platform: template
+    name: 'P039: Summer / Winter (user menu)'
+    id: summer_winter_setting_user
+    options:
+      - "0 = Inactive"
+      - "1 = for UK (SU on display) DHW active only (no heating)"
+    entity_category: config
+    icon: "mdi:electric-switch"
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_select_param(39, id(summer_winter_setting_user), x.c_str());
+
+  - platform: template
+    name: 'P040: Activate clock program CH operation'
+    id: activate_clock_program_ch
+    options:
+      - "0 = Inactive"
+      - "1 = Active"
+    entity_category: config
+    icon: "mdi:electric-switch"
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_select_param(40, id(activate_clock_program_ch), x.c_str());
+
+  - platform: template
+    name: 'P057: Reaction OT & RF thermostat'
+    id: response_OT_and_RF_thermostat
+    options:
+      - "0 = Ignore OT demand (When demand below P056 setting)"
+      - "1 = Restrict OT setting (Only if flow temperature < P056 setting)"
+      - "2 = On/Off (No boiler modulation control from Room thermostat)"
+      - "3 = Low load (Boiler operates at min output, OT temp setting ignored)"
+    entity_category: config
+    icon: "mdi:format-list-bulleted"
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_select_param(57, id(response_OT_and_RF_thermostat), x.c_str());
+
+  - platform: template
+    name: 'P076: DHW comfort setting'
+    id: hot_water_comfort_setting
+    options:
+      - "0 = Disabled"
+      - "1 = Eco mode active"
+      - "2 = Full comfort mode active"
+    entity_category: config
+    icon: "mdi:format-list-bulleted"
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_select_param(76, id(hot_water_comfort_setting), x.c_str());
+
+  - platform: template
+    name: 'P081: 3 way valve position (X4 Terminal 3 output)'
+    id: operation_mode_3_way_valve
+    options:
+      - "0 = Powered during a heating demand"
+      - "1 = Powered during a hot water demand "
+      - "2 = Powered during a heating demand and standby"
+      - "3 = Powered during a hot water demand and standby"
+    entity_category: config
+    icon: "mdi:valve"
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_select_param(81, id(operation_mode_3_way_valve), x.c_str());
+
+  - platform: template
+    name: 'P085: Legionella protection'
+    id: legionella_protection
+    options:
+      - "0 = Inactive"
+      - "1 = Active (only with an external cylinder P001 = 1)"
+    entity_category: config
+    icon: "mdi:electric-switch"
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_select_param(85, id(legionella_protection), x.c_str());
+
+  - platform: template
+    name: 'P087: Domestic hot water timer enable / disable'
+    id: dhw_timer
+    options:
+      - "0 = Inactive"
+      - "1 = Active"
+    entity_category: config
+    icon: "mdi:electric-switch"
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_select_param(87, id(dhw_timer), x.c_str());
+
+  - platform: template
+    name: 'P090: Relay 1 function (Terminal 3 on X4) '
+    id: function_relay_re1
+    options:
+      - "0 = Output depending on setting of P081"
+      - "1 = Output when heat demand on LT zone"
+      - "2 = Output during all heating demands"
+      - "3 = Output for external heat source"
+      - "4 = Output for external central heating pump"
+      - "5 = Output during DHW demand (P001 set to 1) Solo boiler"
+      - "6 = Output during DHW demand (P001 set to 0) Combination boiler"
+    entity_category: config
+    icon: "mdi:electric-switch"
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_select_param(90, id(function_relay_re1), x.c_str());
+
+  - platform: template
+    name: 'P091: Relay 2 function (Terminal 3 on X3)'
+    id: function_relay_re2
+    options:
+      - "0 = Output during CH demand"
+      - "1 = Output when heat demand on LT zone"
+      - "2 = Output during all heating demands"
+      - "3 = Output for external heat source"
+      - "4 = Output for external central heating pump"
+      - "5 = Output during DHW demand (P001 set to 1) Solo boiler"
+      - "6 = Output during DHW demand (P001 set to 0) Combination boiler"
+    entity_category: config
+    icon: "mdi:electric-switch"
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_select_param(91, id(function_relay_re2), x.c_str());
+
+  - platform: template
+    name: 'P097: Alarm relay function'
+    id: function_alarm_relay
+    options:
+      - "0 = Inactive"
+      - "1 = Active"
+    entity_category: config
+    icon: "mdi:electric-switch"
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_select_param(97, id(function_alarm_relay), x.c_str());
+
+  - platform: template
+    name: 'P100: Function-T ext1 (Input control Terminals 3 - 4 X13)'
+    id: function_ext1_temp_input
+    options:
+      - "0 = Default"
+      - "1 = Safety sensor active (LT Zone)"
+      - "2 = Unknown 2"
+      - "3 = Unknown 3"
+    entity_category: config
+    icon: "mdi:import"
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_select_param(100, id(function_ext1_temp_input), x.c_str());
+
+  - platform: template
+    name: 'P101: Function-T ext2 (Input control Terminals 4 - 5 X13)'
+    id: function_ext2_temp_input
+    options:
+      - "0 = NTC Cylinder sensor active"
+      - "1 = Unknown 1"
+      - "2 = Unknown 2"
+      - "3 = Unknown 3"
+    entity_category: config
+    icon: "mdi:import"
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_select_param(101, id(function_ext2_temp_input), x.c_str());
+
+  - platform: template
+    name: 'P104: X10 output Pin 1=0-10v+, 2=0-10v-, 3=Gnd, 4=24v aux'
+    id: function_x10_output
+    options:
+      - "0 = Inactive"
+      - "1 = 0-10v power"
+      - "2 = 0-10v temp control"
+    entity_category: config
+    icon: "mdi:import"
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_select_param(104, id(function_x10_output), x.c_str());
+
+  - platform: template
+    name: 'P255: factory reset'
+    id: factory_reset
+    options:
+      - "0 = Do nothing"
+      - "1 = Do nothing"
+      - "2 = Do nothing"
+      - "3 = Do nothing"
+      - "4 = Do nothing"
+      - "5 = Do nothing"
+      - "6 = Do nothing"
+      - "7 = Do nothing"
+      - "8 = Do nothing"
+      - "9 = reset to restore factory settings"
+    entity_category: config
+    icon: "mdi:import"
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_select_param(255, id(factory_reset), x.c_str());
+
 number:
   - platform: template
-    name: Max Heating Power (P010)
+    name: 'P009: Boiler Input load'
+    id: load_adjustment
+    entity_category: config
+    min_value: -5
+    max_value: 5
+    step: 1
+    icon: "mdi:knob"
+    unit_of_measurement: '%'
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(9, x);
+
+  - platform: template
+    name: 'P010: Maximum CH output'
     id: max_heating_power
     entity_category: config
     min_value: 25
@@ -520,10 +815,10 @@ number:
             static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(10, x);
 
   - platform: template
-    name: Min Heating Power (P011)
+    name: 'P011: Minimum CH output (Max as P010)'
     id: min_heating_power
     entity_category: config
-    min_value: 1
+    min_value: 0
     max_value: 100
     step: 1
     icon: "mdi:gas-burner"
@@ -534,10 +829,108 @@ number:
             static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(11, x);
 
   - platform: template
-    name: HT Zone Max Temperature (P050)
-    id: ht_zone_setpoint_max
+    name: 'P012: Fan speed during CH Ignition phase'
+    id: start_rpm_heating
     entity_category: config
-    min_value: 20
+    min_value: 40
+    max_value: 100
+    step: 1
+    icon: "mdi:gauge"
+    unit_of_measurement: '%'
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(12, x);
+
+  - platform: template
+    name: 'P031: Maximum capacity of modulating CH pump'
+    id: pump_maximum
+    entity_category: config
+    min_value: 15
+    max_value: 100
+    step: 1
+    icon: "mdi:pump"
+    unit_of_measurement: '%'
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(31, x);
+
+  - platform: template
+    name: 'P032: Minimum capacity of modulating CH pump (to max value P031)'
+    id: pump_minimum
+    entity_category: config
+    min_value: 15
+    max_value: 100
+    step: 1
+    icon: "mdi:pump"
+    unit_of_measurement: '%'
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(32, x);
+
+  - platform: template
+    name: 'P033: CH pump overrun after heating demand'
+    id: pump_afterrun_central_heating
+    entity_category: config
+    min_value: 0
+    max_value: 15
+    step: 1
+    icon: "mdi:timer-sync-outline"
+    unit_of_measurement: 'minute(s)'
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(33, x);
+
+  - platform: template
+    name: 'P034: CH pump overrun after dhw production'
+    id: pump_afterrun_boiler
+    entity_category: config
+    min_value: 0
+    max_value: 15
+    step: 1
+    icon: "mdi:timer-sync-outline"
+    unit_of_measurement: 'minute(s)'
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(34, x);
+
+  - platform: template
+    name: 'P036: Anti-Cycle time central heating (Zone time when LT/HT enabled)'
+    id: anti_pendulum_time_heating
+    entity_category: config
+    min_value: 0
+    max_value: 15
+    step: 1
+    icon: "mdi:timer-sync-outline"
+    unit_of_measurement: 'minute(s)'
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(36, x);
+
+  - platform: template
+    name: 'P037: Delay time post CH demand'
+    id: wait_time_heating_response
+    entity_category: config
+    min_value: 0
+    max_value: 15
+    step: 1
+    icon: "mdi:timer-sync-outline"
+    unit_of_measurement: 'minute(s)'
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(37, x);
+
+  - platform: template
+    name: 'P050: Max CH flow temperature (user setting) (HT Zone Max Temperature)'
+    id: delivery_temperature_control_panel
+    entity_category: config
+    min_value: 10
     max_value: 90
     step: 1
     icon: "mdi:coolant-temperature"
@@ -548,7 +941,77 @@ number:
             static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(50, x);
 
   - platform: template
-    name: LT Zone Max Temperature (P060)
+    name: 'P051: Min CH flow temp setting for outside weather comp / heatcurve'
+    id: heatcurve_minimal_delivery_temperature
+    entity_category: config
+    min_value: 10
+    max_value: 90
+    step: 1
+    icon: "mdi:coolant-temperature"
+    unit_of_measurement: °C
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(51, x);
+
+  - platform: template
+    name: 'P052: Min outside temp setting for outside weather comp / heatcurve'
+    id: heatcurve_minimal_outside_temperature
+    entity_category: config
+    min_value: -30
+    max_value: 10
+    step: 1
+    icon: "mdi:coolant-temperature"
+    unit_of_measurement: °C
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(52, x);
+
+  - platform: template
+    name: 'P053: Max outside temp setting for outside weather comp / heatcurve'
+    id: heatcurve_maximal_outside_temperature
+    entity_category: config
+    min_value: 10
+    max_value: 30
+    step: 1
+    icon: "mdi:coolant-temperature"
+    unit_of_measurement: °C
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(53, x);
+
+  - platform: template
+    name: 'P056: Min CH flow temp OT & RF options'
+    id: min_heating_delivery_temp_ot_and_rf
+    entity_category: config
+    min_value: 10
+    max_value: 60
+    step: 1
+    icon: "mdi:coolant-temperature"
+    unit_of_measurement: °C
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(56, x);
+
+  - platform: template
+    name: 'P059: Maximum value adjustment of P050'
+    id: max_setting_p050
+    entity_category: config
+    min_value: 10
+    max_value: 90
+    step: 1
+    icon: "mdi:coolant-temperature"
+    unit_of_measurement: °C
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(59, x);
+
+  - platform: template
+    name: 'P060: LT Zone Max flow temp (Only when LT/HT enabled)'
     id: lt_zone_setpoint_max
     entity_category: config
     min_value: 20
@@ -562,7 +1025,7 @@ number:
             static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(60, x);
 
   - platform: template
-    name: Max Domestic Water Heating Power (P070)
+    name: 'P070: Max DHW output'
     id: max_water_heating_power
     entity_category: config
     min_value: 20
@@ -576,11 +1039,11 @@ number:
             static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(70, x);
 
   - platform: template
-    name: Min Domestic Water Heating Power (P071)
+    name: 'P071: Min DHW output'
     id: min_water_heating_power
     entity_category: config
-    min_value: 1
-    max_value: 100
+    min_value: 13
+    max_value: 50
     step: 1
     icon: "mdi:gas-burner"
     unit_of_measurement: '%'
@@ -590,7 +1053,35 @@ number:
             static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(71, x);
 
   - platform: template
-    name: Number of ECO days (P074)
+    name: 'P072: Fan speed during DHW Ignition phase'
+    id: start_speed_hot_water
+    entity_category: config
+    min_value: 40
+    max_value: 100
+    step: 1
+    icon: "mdi:gauge"
+    unit_of_measurement: '%'
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(72, x);
+
+  - platform: template
+    name: 'P073: Stand-by temp at comfort level'
+    id: comfort_keep_temperature
+    entity_category: config
+    min_value: 0
+    max_value: 65
+    step: 1
+    icon: "mdi:coolant-temperature"
+    unit_of_measurement: °C
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(73, x);
+
+  - platform: template
+    name: 'P074: Amount ECO-days (0=Controlled via OpenTherm)'
     id: nof_eco_days
     entity_category: config
     min_value: 0
@@ -602,6 +1093,61 @@ number:
       then:
         - lambda: |-
             static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(74, x);
+
+  - platform: template
+    name: 'P075: Flow temperature during DHW demand (when heating an external hot water cylinder)'
+    id: control_temperature_boiler_operation
+    entity_category: config
+    min_value: 60
+    max_value: 90
+    step: 1
+    icon: "mdi:coolant-temperature"
+    unit_of_measurement: °C
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(75, x);
+
+  - platform: template
+    name: 'P077: CH delay time post DHW demand'
+    id: wait_time_heating_after_hot_water_delivery
+    entity_category: config
+    min_value: 0
+    max_value: 15
+    step: 1
+    icon: "mdi:timer-sync-outline"
+    unit_of_measurement: 'minute(s)'
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(77, x);
+
+  - platform: template
+    name: 'P078: DHW temperature setting'
+    id: dhw_temp_setting
+    entity_category: config
+    min_value: 10
+    max_value: 55
+    step: 1
+    icon: "mdi:coolant-temperature"
+    unit_of_measurement: °C
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(78, x);
+
+  - platform: template
+    name: 'P086: Comfort Offset (Comfort offset temperature reduction during low DHW demand period)'
+    id: comfort_offset
+    entity_category: config
+    min_value: 0
+    max_value: 60
+    step: 1
+    icon: "mdi:numeric"
+    set_action:
+      then:
+        - lambda: |-
+            static_cast<IntergasXtremeMonitor*>(id(intergas_xtreme_monitor))->set_param(86, x);
 
 custom_component:
   - lambda: |-
