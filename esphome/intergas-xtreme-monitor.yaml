@@ -1127,7 +1127,7 @@ number:
     id: dhw_temp_setting
     entity_category: config
     min_value: 10
-    max_value: 55
+    max_value: 65
     step: 1
     icon: "mdi:coolant-temperature"
     unit_of_measurement: °C
