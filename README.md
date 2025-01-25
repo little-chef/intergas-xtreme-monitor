@@ -1,13 +1,26 @@
-# Home-Assistant Intergas Central Heating monitor
+# Home-Assistant Intergas Central Heating monitor/controller
 
-This project provides the necessary tools and scripts to monitor a Intergas
-central heating system via the IDS interface.
+This project provides the necessary tools and scripts to monitor/control a Intergas
+central heating system via the IDS diagnosis interface.
 
 It connects an ESP32 NodeMCU board through optocouplers to the burner control
 board of the Intergas Xtreme. From there detailed statistics are published to
-Home Assistant for accurate monitoring of the device.
+Home Assistant for accurate monitoring/controlling of the device.
 
-This project has only been tested with a Intergas Xtreme 36 central heater.
+This project has only been qualified with a Intergas Xtreme 36 central heater.
+
+## Features:
+
+This project allows deep monitoring/controlling of all internal metrics/settings of the Intergas Xtreme.
+(Screenshots below only show a subset of he possible settings, full list can be found [here](./esphome/intergas-xtreme-monitor.yaml#L83))
+
+<img src="./images/deep-monitoring.png">
+
+
+It also aenables control of all configuration settings of the Intergas Xtreme via Home-Assistant,
+including all 'Expert Settings'. This enables keeping track of these settings over time, and easy revert back
+to older settings.
+<img src="./images/parameter-control-via-home-assistant.png">
 
 # Home Assistant
 The connection to Home Assistant is done via ESPHome and Wifi.
