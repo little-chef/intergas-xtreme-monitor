@@ -37,9 +37,9 @@ output:
       number: GPIO2
 
 # A number of One-Wire sensors can be added to the ESP32.
-dallas:
-  - pin: GPIO27
-    update_interval: 2s
+one_wire:
+  - platform: gpio
+    pin: GPIO27
 
 esphome:
   name: ${devicename}
@@ -64,7 +64,7 @@ api:
     key: !secret esphome_hassio_api_encryption_key
 
 ota:
-  safe_mode: True
+  platform: esphome
   password: !secret esphome_hassio_ota_pw
   on_begin:
     then:
