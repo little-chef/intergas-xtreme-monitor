@@ -79,16 +79,6 @@ The code and content have been inspired by these public sources:
 * https://gathering.tweakers.net/forum/list_messages/2056344
 * https://theintergasshop.co.uk/content/181-intergas-boiler-manuals -> IDS X Range Software
 
-# Why is the ESP8266 NodeMCU not supported anymore
-The monitor adds a lot of sensors to the Home-Assistant dashboard.
-The ESP8266 will run into memory fragmentation issues that impacts its stability.
-Also, the webserver cannot be enabled and OTA updates go very slow and will result
-in timeouts on the Wifi connection. Frequently updates need to be done via USB due
-to all failures. Furthermore, the amount of UARTs are limited in the ESP8266, and
-some port and pin swapping is required to prevent polluting the data flow towards
-caused by the bootlogging of the ESP8266.
-The more powerful ESP32 does not show these kind of issues, and is therefor preferred.
-
 # Final Note:
 
 Note that nothing in this project is supported by Intergas, neither is
