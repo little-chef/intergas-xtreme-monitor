@@ -28,7 +28,7 @@ Prerequisites for the physical connection:
 * As opto coupler we use the [4N25](https://www.conrad.nl/p/lite-on-optocoupler-fototransistor-4n25-dip-6-transistor-dc-1127375) type.
 
 * As controller we use:
-  * a [NodeMCU-32s (ESP32)](https://esphome.io/devices/nodemcu_esp32.html) Development board
+  * a [NodeMCU-32s (ESP32)](https://docs.platformio.org/en/latest/boards/espressif32/nodemcu-32s.html) Development board
 
 
 # Schematics design
