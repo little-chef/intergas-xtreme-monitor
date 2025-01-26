@@ -423,6 +423,21 @@ sensor:
     accuracy_decimals: 2
     device_class: temperature
 
+  # include a number of one-wire sensors. These sensors are not connected to
+  # Intergas Xtreme boiler, but are additional sensors like DS18B20
+  # --------------------------------------------------------------------
+  # Uncomment the following section, and add more sensors as required
+  # --------------------------------------------------------------------
+  #- platform: dallas_temp
+  #  address: 0x1234567890abcdef
+  #  accuracy_decimals: 1
+  #  id: central_heater_return_temperature
+  #  name: "1Wire: Central Heater Return Temperature"
+  #  unit_of_measurement: °C
+  #  device_class: temperature
+  #  update_interval: 2s
+  # --------------------------------------------------------------------
+
   - platform: uptime
     name: Uptime Sensor
     id: uptime_sensor
