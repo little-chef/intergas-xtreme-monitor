@@ -17,7 +17,7 @@ esp32:
 #   from the central heating system and to reduce the risk of damaging it when
 #   some malfunction happens inside the monitor.
 uart:
-  - id: uart_2
+  - id: uart_boiler
     rx_pin: GPIO16
     tx_pin: GPIO17
     baud_rate: 9600

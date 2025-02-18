@@ -184,7 +184,6 @@ class IntergasXtremeMonitor : public PollingComponent {
         }
 
         void setup() override {
-            Serial2.begin(9600);
             next_state = INIT;
         }
 
@@ -283,9 +282,9 @@ class IntergasXtremeMonitor : public PollingComponent {
             std::string log_cmd = get_log_cmd(ids_cmd->cmd);
             ESP_LOGD(TAG, "Send command %s", log_cmd.c_str());
             if (ids_cmd->crc_needed) {
-                Serial2.write(add_command_crc(ids_cmd->cmd).c_str());
+                id(uart_boiler).write_str(add_command_crc(ids_cmd->cmd).c_str());
             } else {
-                Serial2.write(ids_cmd->cmd.c_str());
+                id(uart_boiler).write_str(ids_cmd->cmd.c_str());
             }
             return PARSE_READ_RESPONSE;
         }
@@ -294,7 +293,7 @@ class IntergasXtremeMonitor : public PollingComponent {
             ControlState set_next_state = SEND_NEXT_COMMAND;
             ids_command *ids_cmd = current_command;
 
-            size_t len = Serial2.available();
+            size_t len = id(uart_boiler).available();
 
             // Check if enough data is received
             if (len < ids_cmd->response_len) {
@@ -308,7 +307,7 @@ class IntergasXtremeMonitor : public PollingComponent {
             }
 
             std::vector<uint8_t> sbuf(len);
-            Serial2.readBytes(sbuf.data(), len);
+            id(uart_boiler).read_array(sbuf.data(), len);
 
             // Verify response checksum, that is the last byte of the data set
             if ((ids_cmd->crc_needed) && (!verify_crc(sbuf))) {
@@ -349,7 +348,7 @@ class IntergasXtremeMonitor : public PollingComponent {
                 format_hex_pretty(pcmd.cmd_sequence.data(), pcmd.cmd_sequence.size()).c_str(),
                 pcmd.cmd_sequence.size());
 
-            Serial2.write(pcmd.cmd_sequence.data(), pcmd.cmd_sequence.size());
+            id(uart_boiler).write_array(pcmd.cmd_sequence.data(), pcmd.cmd_sequence.size());
 
             force_refresh_cmd(pcmd.refresh_cmd);
 
@@ -365,10 +364,10 @@ class IntergasXtremeMonitor : public PollingComponent {
                 format_hex_pretty(pcmd.cmd_sequence.data(), pcmd.cmd_sequence.size()).c_str(),
                 pcmd.cmd_sequence.size());
 
-            size_t len = Serial2.available();
+            size_t len = id(uart_boiler).available();
             if (len) {
                 std::vector<uint8_t> sbuf(len);
-                Serial2.readBytes(sbuf.data(), len);
+                id(uart_boiler).read_array(sbuf.data(), len);
 
                 ESP_LOGI(TAG, "Store response: %s",
                     format_hex_pretty(sbuf.data(), sbuf.size()).c_str());
