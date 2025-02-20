@@ -80,6 +80,16 @@ switch:
   - platform: restart
     name: "Intergas Xtreme monitor restart"
 
+# custom_component has been removed from 2025.2.0 onwards from the esphome
+# codebase. As short-term containment we use the latest known good
+# custom_component from ESPHome's last working release in GitHub
+external_components:
+  - source:
+      type: git
+      url: https://github.com/esphome/esphome
+      ref: refs/tags/2024.12.4
+    components: [ custom_component ]
+
 binary_sensor:
   - platform: template
     name: Heater Pump
