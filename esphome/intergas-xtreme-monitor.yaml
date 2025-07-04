@@ -2,6 +2,7 @@
 substitutions:
   devicename: intergas-xtreme-monitor
   friendly_devicename: Intergas Xtreme monitoring
+  device_description: 'Device for monitoring and remotely configure an Intergas Xtreme heating system'
 
 esp32:
   board: nodemcu-32s
