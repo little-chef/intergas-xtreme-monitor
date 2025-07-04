@@ -952,3 +952,5 @@ class IntergasXtremeMonitor : public PollingComponent {
             }
         }
 };
+
+static IntergasXtremeMonitor *intergas_xtreme_monitor;
