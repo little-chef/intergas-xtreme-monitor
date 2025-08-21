@@ -6,6 +6,8 @@ substitutions:
 
 esp32:
   board: nodemcu-32s
+  framework:
+    type: esp-idf
 
 # Enable logging
 # The ESP32 has 3 UARTs:

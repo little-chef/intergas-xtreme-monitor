@@ -948,7 +948,7 @@ bool IntergasXtremeMonitor::get_bit(uint8_t data, int bit) {
     return data & (1 << bit);
 }
 
-float IntergasXtremeMonitor::getFloat24(byte msbh, byte msbl, byte lsb) {
+float IntergasXtremeMonitor::getFloat24(const uint8_t msbh, const uint8_t msbl, const uint8_t lsb) {
     // Calculate float value from four bytes
     uint32_t _msbh = msbh;
     uint32_t _msbl = msbl;
@@ -956,7 +956,7 @@ float IntergasXtremeMonitor::getFloat24(byte msbh, byte msbl, byte lsb) {
     return ((float)dword) / 10000.0;
 }
 
-float IntergasXtremeMonitor::getFloat32(byte msbh, byte msbl, byte lsbh, byte lsbl) {
+float IntergasXtremeMonitor::getFloat32(const uint8_t msbh, const uint8_t msbl, const uint8_t lsbh, const uint8_t lsbl) {
     // Calculate float value from four bytes
     uint32_t _msbh = msbh;
     uint32_t _msbl = msbl;
@@ -965,21 +965,21 @@ float IntergasXtremeMonitor::getFloat32(byte msbh, byte msbl, byte lsbh, byte ls
     return ((float)dword) / 10000.0;
 }
 
-float IntergasXtremeMonitor::getFloat(byte msb, byte lsb) {
+float IntergasXtremeMonitor::getFloat(const uint8_t msb, const uint8_t lsb) {
     // Calculate float value from two bytes
     uint16_t _msb = msb;
     int16_t word = (int16_t)(_msb << 8 | lsb);
     return ((float)word) / 100.0;
 }
 
-int16_t IntergasXtremeMonitor::getInt(byte msb, byte lsb) {
+int16_t IntergasXtremeMonitor::getInt(const uint8_t msb, const uint8_t lsb) {
     // Calculate integer value from two bytes
     uint16_t _msb = msb;
     int16_t word = (int16_t)(_msb << 8 | lsb);
     return word;
 }
 
-int32_t IntergasXtremeMonitor::getInt24(byte msbh, byte msbl, byte lsb) {
+int32_t IntergasXtremeMonitor::getInt24(const uint8_t msbh, const uint8_t msbl, const uint8_t lsb) {
     // Calculate 24 bit integer value from two bytes
     uint32_t _msbh = msbh;
     uint32_t _msbl = msbl;
@@ -987,12 +987,12 @@ int32_t IntergasXtremeMonitor::getInt24(byte msbh, byte msbl, byte lsb) {
     return word;
 }
 
-int8_t IntergasXtremeMonitor::getSigned(byte lsb) {
+int8_t IntergasXtremeMonitor::getSigned(const uint8_t lsb) {
     // Calculate signed value from one byte
     return (int8_t)lsb;
 }
 
-float IntergasXtremeMonitor::getTemp(byte msb, byte lsb){
+float IntergasXtremeMonitor::getTemp(const uint8_t msb, const uint8_t lsb){
     uint16_t _msb = msb;
     int16_t word = (int16_t)(_msb << 8 | lsb);
     if ((word <= -5100) || (word == SHRT_MAX)) {

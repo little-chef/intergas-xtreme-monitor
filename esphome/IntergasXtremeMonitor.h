@@ -261,13 +261,13 @@ class IntergasXtremeMonitor : public PollingComponent {
         void process_params(std::string cmd, const std::vector<uint8_t> &sbuf);
 
         bool get_bit(uint8_t data, int bit);
-        float getFloat24(byte msbh, byte msbl, byte lsb);
-        float getFloat32(byte msbh, byte msbl, byte lsbh, byte lsbl);
-        float getFloat(byte msb, byte lsb);
-        int16_t getInt(byte msb, byte lsb);
-        int32_t getInt24(byte msbh, byte msbl, byte lsb);
-        int8_t getSigned(byte lsb);
-        float getTemp(byte msb, byte lsb);
+        float getFloat24(const uint8_t msbh, const uint8_t msbl, const uint8_t lsb);
+        float getFloat32(const uint8_t msbh, const uint8_t msbl, const uint8_t lsbh, const uint8_t lsbl);
+        float getFloat(const uint8_t msb, const uint8_t lsb);
+        int16_t getInt(const uint8_t msb, const uint8_t lsb);
+        int32_t getInt24(const uint8_t msbh, const uint8_t msbl, const uint8_t lsb);
+        int8_t getSigned(const uint8_t lsb);
+        float getTemp(const uint8_t msb, const uint8_t lsb);
 
         bool is_equal(const float &value1, const float &value2);
         bool is_equal(const char* &value1, const char* &value2);
