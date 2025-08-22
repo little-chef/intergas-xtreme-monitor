@@ -124,8 +124,7 @@ IntergasXtremeMonitor::IntergasXtremeMonitor(
 
     output::BinaryOutput *onboard_led
 
-) : PollingComponent(500),
-    heater_alarm_status(heater_alarm_status),
+) : heater_alarm_status(heater_alarm_status),
     heater_burner_block(heater_burner_block),
     heater_cascade_relay(heater_cascade_relay),
     heater_gas_valve(heater_gas_valve),
@@ -244,6 +243,7 @@ IntergasXtremeMonitor::IntergasXtremeMonitor(
     uart_boiler(uart_boiler),
     onboard_led(onboard_led)
 {
+    next_state = INIT;
 }
 
 void IntergasXtremeMonitor::stop_polling() {
@@ -336,10 +336,6 @@ void IntergasXtremeMonitor::banner() {
     ESP_LOGI(TAG, "ESPHome Intergas Xtreme IDS Monitor");
 }
 
-void IntergasXtremeMonitor::setup() {
-    next_state = INIT;
-}
-
 // On every poll update, we do one single thing. Either send a command
 // to the central heater or parse the response. The goal is to keep the
 // update() cycle short, as in the background also other tasks need
@@ -353,7 +349,6 @@ void IntergasXtremeMonitor::setup() {
 // a good minimal the central heater can respond within.
 void IntergasXtremeMonitor::update() {
     switch (next_state) {
-    case PRE_INIT:              next_state = state_pre_init();              break;
     case INIT:                  next_state = state_init();                  break;
     case WAIT_CONNECTED:        next_state = state_wait_connected();        break;
     case SEND_NEXT_COMMAND:     next_state = state_send_next_command();     break;
@@ -362,12 +357,6 @@ void IntergasXtremeMonitor::update() {
     case STOPPED:               next_state = state_stopped();               break;
     case FAILURE:               next_state = state_failed();                break;
     }
-}
-
-IntergasXtremeMonitor::ControlState IntergasXtremeMonitor::state_pre_init() {
-    // Should not happen...
-    ESP_LOGE(TAG, "Current State: PRE_INIT");
-    return INIT;
 }
 
 IntergasXtremeMonitor::ControlState IntergasXtremeMonitor::state_init() {

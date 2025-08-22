@@ -54,6 +54,7 @@ esphome:
     - priority: 600
       then:
       - lambda: |-
+          ESP_LOGI("on_boot", "On boot initialize");
           esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor = 
             new esphome::intergas_xtreme_monitor_component::IntergasXtremeMonitor(
               // BinarySensor *
@@ -179,7 +180,17 @@ esphome:
               // Binary Output
               onboard_led
             );
-          App.register_component(esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor);
+
+interval:
+  - interval: 0.5s
+    startup_delay: 2s
+    then:
+      - lambda: |-
+          if (esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor) {
+            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->update();
+          } else {
+            ESP_LOGI("interval", "Waiting for On boot initialize");
+          }
 
 wifi:
   networks:

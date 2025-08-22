@@ -4,7 +4,7 @@
 namespace esphome {
 namespace intergas_xtreme_monitor_component {
 
-class IntergasXtremeMonitor : public PollingComponent {
+class IntergasXtremeMonitor {
     public:
         IntergasXtremeMonitor(
             binary_sensor::BinarySensor *heater_alarm_status,
@@ -128,9 +128,7 @@ class IntergasXtremeMonitor : public PollingComponent {
         void set_param(uint8_t param, float value);
         void set_select_param(uint8_t param, select::Select *select, const char* text_value);
     
-    protected:
-        void setup() override;
-        void update() override;
+        void update();
     
     private:
         const std::vector<int> list_xtreme_parameters{
@@ -141,7 +139,6 @@ class IntergasXtremeMonitor : public PollingComponent {
         };
 
         enum ControlState {
-            PRE_INIT,
             INIT,
             WAIT_CONNECTED,
             SEND_NEXT_COMMAND,
@@ -150,7 +147,7 @@ class IntergasXtremeMonitor : public PollingComponent {
             STOPPED,
             FAILURE
         };
-        ControlState next_state = PRE_INIT;
+        ControlState next_state;
 
         typedef void (IntergasXtremeMonitor::*cmd_fptr)(std::string,
                                                         const std::vector<uint8_t> &);
@@ -442,7 +439,7 @@ class IntergasXtremeMonitor : public PollingComponent {
 
 };
 
-static IntergasXtremeMonitor *intergas_xtreme_monitor;
+static IntergasXtremeMonitor *intergas_xtreme_monitor = nullptr;
 
 }  // namespace intergas_xtreme_monitor_component
 }  // namespace esphome
