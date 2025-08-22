@@ -204,6 +204,9 @@ wifi:
 
 captive_portal:
 
+debug:
+  update_interval: 5s
+
 # Enable Home Assistant API
 api:
   encryption:
@@ -594,6 +597,10 @@ sensor:
     name: "Boiler Room WiFi Signal"
     update_interval: 60s
 
+  - platform: debug
+    free:
+      name: "Heap Free"
+
 text_sensor:
   - platform: template
     name: LT/HT Zone valve
@@ -664,6 +671,10 @@ text_sensor:
     name: Monitor Status
     id: monitor_status
     icon: "mdi:text-box"
+
+  - platform: debug
+    reset_reason:
+      name: "Reset Reason"
 
 select:
   - platform: template
