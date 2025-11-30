@@ -49,6 +49,8 @@ one_wire:
 
 esphome:
   name: ${devicename}
+  friendly_name: "${friendly_devicename}"
+  comment: "${device_description}"
   includes:
     - intergas-xtreme/esphome/IntergasXtremeMonitor.h
     - intergas-xtreme/esphome/IntergasXtremeMonitor.cpp
