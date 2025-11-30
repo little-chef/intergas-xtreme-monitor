@@ -257,7 +257,7 @@ void IntergasXtremeMonitor::set_param(uint8_t param, float value) {
     store_parameter(param, static_cast<uint8_t>(value), reg);
 }
 
-auto IntergasXtremeMonitor::set_select_param(uint8_t param, select::Select *select, const char* text_value) -> void {
+auto IntergasXtremeMonitor::set_select_param(uint8_t param, select::Select *select, std::string &text_value) -> void {
     auto index = select->index_of(text_value);
     if (index.has_value()) {
         set_param(param, index.value());

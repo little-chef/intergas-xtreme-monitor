@@ -56,16 +56,48 @@ esphome:
     - intergas-xtreme/esphome/IntergasXtremeMonitor.cpp
   build_path: "../config/esphome/build/$devicename"
 
+globals:
+  - id: intergas_xtreme_monitor
+    type: void *
+    restore_value: no
+    initial_value: 'nullptr'
+
+script:
+  - id: set_param
+    parameters:
+        param: uint8_t
+        value: float
+    then:
+      - lambda: |-
+          auto & obj =
+              *static_cast<esphome::intergas_xtreme_monitor_component::IntergasXtremeMonitor*>(
+                  id(intergas_xtreme_monitor));
+          obj.set_param(param, value);
+  - id: set_select_param
+    parameters:
+        param: uint8_t
+        select: select::Select*
+        text_value: std::string&
+    then:
+      - lambda: |-
+          auto & obj =
+              *static_cast<esphome::intergas_xtreme_monitor_component::IntergasXtremeMonitor*>(
+                  id(intergas_xtreme_monitor));
+          obj.set_select_param(param, select, text_value);
+
 interval:
   - interval: 0.5s
     startup_delay: 10s
     then:
       - lambda: |-
-          if (esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor) {
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->update();
+          if (id(intergas_xtreme_monitor)) {
+            auto & obj =
+                *static_cast<esphome::intergas_xtreme_monitor_component::IntergasXtremeMonitor*>(
+                    id(intergas_xtreme_monitor));
+            obj.update();
           } else {
             ESP_LOGI("on_boot", "On boot initialize");
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor = 
+            id(intergas_xtreme_monitor) =
               new esphome::intergas_xtreme_monitor_component::IntergasXtremeMonitor(
                 // BinarySensor *
                 heater_alarm_status,
@@ -219,7 +251,10 @@ ota:
     then:
       - logger.log: "OTA start"
       - lambda: |-
-          esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->stop_polling();
+            auto & obj =
+                *static_cast<esphome::intergas_xtreme_monitor_component::IntergasXtremeMonitor*>(
+                    id(intergas_xtreme_monitor));
+            obj.stop_polling();
 
 time:
   - platform: homeassistant
@@ -690,7 +725,7 @@ select:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_select_param(1, id(installation_type), x.c_str());
+            id(set_select_param)->execute(1, id(installation_type), x);
 
   - platform: template
     name: 'P002: Display Option'
@@ -704,7 +739,7 @@ select:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_select_param(2, id(display_option), x.c_str());
+            id(set_select_param)->execute(2, id(display_option), x);
 
   - platform: template
     name: 'P030: Central heating (CH) pump setting'
@@ -719,7 +754,7 @@ select:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_select_param(30, id(pump_setting), x.c_str());
+            id(set_select_param)->execute(30, id(pump_setting), x);
 
   - platform: template
     name: 'P035: Pump step modulation'
@@ -732,7 +767,7 @@ select:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_select_param(35, id(step_modulation), x.c_str());
+            id(set_select_param)->execute(35, id(step_modulation), x);
 
   - platform: template
     name: 'P038: Summer / Winter setting'
@@ -745,7 +780,7 @@ select:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_select_param(38, id(summer_winter_setting), x.c_str());
+            id(set_select_param)->execute(38, id(summer_winter_setting), x);
 
   - platform: template
     name: 'P039: Summer / Winter (user menu)'
@@ -758,7 +793,7 @@ select:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_select_param(39, id(summer_winter_setting_user), x.c_str());
+            id(set_select_param)->execute(39, id(summer_winter_setting_user), x);
 
   - platform: template
     name: 'P040: Activate clock program CH operation'
@@ -771,7 +806,7 @@ select:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_select_param(40, id(activate_clock_program_ch), x.c_str());
+            id(set_select_param)->execute(40, id(activate_clock_program_ch), x);
 
   - platform: template
     name: 'P057: Reaction OT & RF thermostat'
@@ -786,7 +821,7 @@ select:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_select_param(57, id(response_OT_and_RF_thermostat), x.c_str());
+            id(set_select_param)->execute(57, id(response_OT_and_RF_thermostat), x);
 
   - platform: template
     name: 'P076: DHW comfort setting'
@@ -800,7 +835,7 @@ select:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_select_param(76, id(hot_water_comfort_setting), x.c_str());
+            id(set_select_param)->execute(76, id(hot_water_comfort_setting), x);
 
   - platform: template
     name: 'P081: 3 way valve position (X4 Terminal 3 output)'
@@ -815,7 +850,7 @@ select:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_select_param(81, id(operation_mode_3_way_valve), x.c_str());
+            id(set_select_param)->execute(81, id(operation_mode_3_way_valve), x);
 
   - platform: template
     name: 'P085: Legionella protection'
@@ -828,7 +863,7 @@ select:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_select_param(85, id(legionella_protection), x.c_str());
+            id(set_select_param)->execute(85, id(legionella_protection), x);
 
   - platform: template
     name: 'P087: Domestic hot water timer enable / disable'
@@ -841,7 +876,7 @@ select:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_select_param(87, id(dhw_timer), x.c_str());
+            id(set_select_param)->execute(87, id(dhw_timer), x);
 
   - platform: template
     name: 'P090: Relay 1 function (Terminal 3 on X4) '
@@ -859,7 +894,7 @@ select:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_select_param(90, id(function_relay_re1), x.c_str());
+            id(set_select_param)->execute(90, id(function_relay_re1), x);
 
   - platform: template
     name: 'P091: Relay 2 function (Terminal 3 on X3)'
@@ -877,7 +912,7 @@ select:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_select_param(91, id(function_relay_re2), x.c_str());
+            id(set_select_param)->execute(91, id(function_relay_re2), x);
 
   - platform: template
     name: 'P097: Alarm relay function'
@@ -890,7 +925,7 @@ select:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_select_param(97, id(function_alarm_relay), x.c_str());
+            id(set_select_param)->execute(97, id(function_alarm_relay), x);
 
   - platform: template
     name: 'P100: Function-T ext1 (Input control Terminals 3 - 4 X13)'
@@ -905,7 +940,7 @@ select:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_select_param(100, id(function_ext1_temp_input), x.c_str());
+            id(set_select_param)->execute(100, id(function_ext1_temp_input), x);
 
   - platform: template
     name: 'P101: Function-T ext2 (Input control Terminals 4 - 5 X13)'
@@ -920,7 +955,7 @@ select:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_select_param(101, id(function_ext2_temp_input), x.c_str());
+            id(set_select_param)->execute(101, id(function_ext2_temp_input), x);
 
   - platform: template
     name: 'P104: X10 output Pin 1=0-10v+, 2=0-10v-, 3=Gnd, 4=24v aux'
@@ -934,7 +969,7 @@ select:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_select_param(104, id(function_x10_output), x.c_str());
+            id(set_select_param)->execute(104, id(function_x10_output), x);
 
   - platform: template
     name: 'P255: factory reset'
@@ -955,7 +990,7 @@ select:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_select_param(255, id(factory_reset), x.c_str());
+            id(set_select_param)->execute(255, id(factory_reset), x);
 
 number:
   - platform: template
@@ -970,7 +1005,7 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(9, x);
+            id(set_param)->execute(9, x);
 
   - platform: template
     name: 'P010: Maximum CH output'
@@ -984,7 +1019,7 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(10, x);
+            id(set_param)->execute(10, x);
 
   - platform: template
     name: 'P011: Minimum CH output (Max as P010)'
@@ -998,7 +1033,7 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(11, x);
+            id(set_param)->execute(11, x);
 
   - platform: template
     name: 'P012: Fan speed during CH Ignition phase'
@@ -1012,7 +1047,7 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(12, x);
+            id(set_param)->execute(12, x);
 
   - platform: template
     name: 'P031: Maximum capacity of modulating CH pump'
@@ -1026,7 +1061,7 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(31, x);
+            id(set_param)->execute(31, x);
 
   - platform: template
     name: 'P032: Minimum capacity of modulating CH pump (to max value P031)'
@@ -1040,7 +1075,7 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(32, x);
+            id(set_param)->execute(32, x);
 
   - platform: template
     name: 'P033: CH pump overrun after heating demand'
@@ -1054,7 +1089,7 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(33, x);
+            id(set_param)->execute(33, x);
 
   - platform: template
     name: 'P034: CH pump overrun after dhw production'
@@ -1068,7 +1103,7 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(34, x);
+            id(set_param)->execute(34, x);
 
   - platform: template
     name: 'P036: Anti-Cycle time central heating (Zone time when LT/HT enabled)'
@@ -1082,7 +1117,7 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(36, x);
+            id(set_param)->execute(36, x);
 
   - platform: template
     name: 'P037: Delay time post CH demand'
@@ -1096,7 +1131,7 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(37, x);
+            id(set_param)->execute(37, x);
 
   - platform: template
     name: 'P050: Max CH flow temperature (user setting) (HT Zone Max Temperature)'
@@ -1110,7 +1145,7 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(50, x);
+            id(set_param)->execute(50, x);
 
   - platform: template
     name: 'P051: Min CH flow temp setting for outside weather comp / heatcurve'
@@ -1124,7 +1159,7 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(51, x);
+            id(set_param)->execute(51, x);
 
   - platform: template
     name: 'P052: Min outside temp setting for outside weather comp / heatcurve'
@@ -1138,7 +1173,7 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(52, x);
+            id(set_param)->execute(52, x);
 
   - platform: template
     name: 'P053: Max outside temp setting for outside weather comp / heatcurve'
@@ -1152,7 +1187,7 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(53, x);
+            id(set_param)->execute(53, x);
 
   - platform: template
     name: 'P056: Min CH flow temp OT & RF options'
@@ -1166,7 +1201,7 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(56, x);
+            id(set_param)->execute(56, x);
 
   - platform: template
     name: 'P059: Maximum value adjustment of P050'
@@ -1180,7 +1215,7 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(59, x);
+            id(set_param)->execute(59, x);
 
   - platform: template
     name: 'P060: LT Zone Max flow temp (Only when LT/HT enabled)'
@@ -1194,7 +1229,7 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(60, x);
+            id(set_param)->execute(60, x);
 
   - platform: template
     name: 'P070: Max DHW output'
@@ -1208,7 +1243,7 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(70, x);
+            id(set_param)->execute(70, x);
 
   - platform: template
     name: 'P071: Min DHW output'
@@ -1222,7 +1257,7 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(71, x);
+            id(set_param)->execute(71, x);
 
   - platform: template
     name: 'P072: Fan speed during DHW Ignition phase'
@@ -1236,7 +1271,7 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(72, x);
+            id(set_param)->execute(72, x);
 
   - platform: template
     name: 'P073: Stand-by temp at comfort level'
@@ -1250,7 +1285,7 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(73, x);
+            id(set_param)->execute(73, x);
 
   - platform: template
     name: 'P074: Amount ECO-days (0=Controlled via OpenTherm)'
@@ -1264,7 +1299,7 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(74, x);
+            id(set_param)->execute(74, x);
 
   - platform: template
     name: 'P075: Flow temperature during DHW demand (when heating an external hot water cylinder)'
@@ -1278,7 +1313,7 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(75, x);
+            id(set_param)->execute(75, x);
 
   - platform: template
     name: 'P077: CH delay time post DHW demand'
@@ -1292,7 +1327,7 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(77, x);
+            id(set_param)->execute(77, x);
 
   - platform: template
     name: 'P078: DHW temperature setting'
@@ -1306,7 +1341,7 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(78, x);
+            id(set_param)->execute(78, x);
 
   - platform: template
     name: 'P086: Comfort Offset (Comfort offset temperature reduction during low DHW demand period)'
@@ -1319,4 +1354,4 @@ number:
     set_action:
       then:
         - lambda: |-
-            esphome::intergas_xtreme_monitor_component::intergas_xtreme_monitor->set_param(86, x);
+            id(set_param)->execute(86, x);

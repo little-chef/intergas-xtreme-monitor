@@ -121,12 +121,12 @@ class IntergasXtremeMonitor {
 
             uart::UARTComponent *uart_boiler,
 
-            output::BinaryOutput * onboard_led
+            output::BinaryOutput *onboard_led
         );
     
         void stop_polling();
         void set_param(uint8_t param, float value);
-        void set_select_param(uint8_t param, select::Select *select, const char* text_value);
+        void set_select_param(uint8_t param, select::Select *select, std::string &text_value);
     
         void update();
     
@@ -438,8 +438,6 @@ class IntergasXtremeMonitor {
         output::BinaryOutput *onboard_led;
 
 };
-
-static IntergasXtremeMonitor *intergas_xtreme_monitor = nullptr;
 
 }  // namespace intergas_xtreme_monitor_component
 }  // namespace esphome
