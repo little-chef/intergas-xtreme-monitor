@@ -9,6 +9,9 @@ esp32:
   framework:
     type: esp-idf
 
+esp32_improv:
+  authorizer: none
+
 # Enable logging
 # The ESP32 has 3 UARTs:
 # UART0 is used for logging output.
