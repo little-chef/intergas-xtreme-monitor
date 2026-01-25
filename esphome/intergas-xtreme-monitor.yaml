@@ -638,7 +638,7 @@ sensor:
 
 text_sensor:
   - platform: template
-    name: LT/HT Zone valve
+    name: LT⁄HT Zone valve
     id: heater_dwk
     icon: "mdi:valve"
 
@@ -770,7 +770,7 @@ select:
             id(set_select_param)->execute(35, id(step_modulation), x);
 
   - platform: template
-    name: 'P038: Summer / Winter setting'
+    name: 'P038: Summer ⁄ Winter setting'
     id: summer_winter_setting
     options:
       - "0 = Inactive"
@@ -783,7 +783,7 @@ select:
             id(set_select_param)->execute(38, id(summer_winter_setting), x);
 
   - platform: template
-    name: 'P039: Summer / Winter (user menu)'
+    name: 'P039: Summer ⁄ Winter (user menu)'
     id: summer_winter_setting_user
     options:
       - "0 = Inactive"
@@ -866,7 +866,7 @@ select:
             id(set_select_param)->execute(85, id(legionella_protection), x);
 
   - platform: template
-    name: 'P087: Domestic hot water timer enable / disable'
+    name: 'P087: Domestic hot water timer enable ⁄ disable'
     id: dhw_timer
     options:
       - "0 = Inactive"
@@ -1106,7 +1106,7 @@ number:
             id(set_param)->execute(34, x);
 
   - platform: template
-    name: 'P036: Anti-Cycle time central heating (Zone time when LT/HT enabled)'
+    name: 'P036: Anti-Cycle time central heating (Zone time when LT⁄HT enabled)'
     id: anti_pendulum_time_heating
     entity_category: config
     min_value: 0
@@ -1148,7 +1148,7 @@ number:
             id(set_param)->execute(50, x);
 
   - platform: template
-    name: 'P051: Min CH flow temp setting for outside weather comp / heatcurve'
+    name: 'P051: Min CH flow temp setting for outside weather comp ⁄ heatcurve'
     id: heatcurve_minimal_delivery_temperature
     entity_category: config
     min_value: 10
@@ -1162,7 +1162,7 @@ number:
             id(set_param)->execute(51, x);
 
   - platform: template
-    name: 'P052: Min outside temp setting for outside weather comp / heatcurve'
+    name: 'P052: Min outside temp setting for outside weather comp ⁄ heatcurve'
     id: heatcurve_minimal_outside_temperature
     entity_category: config
     min_value: -30
@@ -1176,7 +1176,7 @@ number:
             id(set_param)->execute(52, x);
 
   - platform: template
-    name: 'P053: Max outside temp setting for outside weather comp / heatcurve'
+    name: 'P053: Max outside temp setting for outside weather comp ⁄ heatcurve'
     id: heatcurve_maximal_outside_temperature
     entity_category: config
     min_value: 10
@@ -1218,7 +1218,7 @@ number:
             id(set_param)->execute(59, x);
 
   - platform: template
-    name: 'P060: LT Zone Max flow temp (Only when LT/HT enabled)'
+    name: 'P060: LT Zone Max flow temp (Only when LT⁄HT enabled)'
     id: lt_zone_setpoint_max
     entity_category: config
     min_value: 20
