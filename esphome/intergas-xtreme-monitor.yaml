@@ -77,7 +77,7 @@ script:
     parameters:
         param: uint8_t
         select: select::Select*
-        text_value: std::string&
+        text_value: std::string
     then:
       - lambda: |-
           auto & obj =

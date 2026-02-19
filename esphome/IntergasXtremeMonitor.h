@@ -126,7 +126,7 @@ class IntergasXtremeMonitor {
     
         void stop_polling();
         void set_param(uint8_t param, float value);
-        void set_select_param(uint8_t param, select::Select *select, std::string &text_value);
+        void set_select_param(uint8_t param, select::Select *select, std::string text_value);
     
         void update();
     
