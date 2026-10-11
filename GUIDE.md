@@ -6,7 +6,7 @@ This guide is for people who want to build the adapter but are new to electronic
 component and pin number, and ends with a safe first software test.
 
 There is no PCB design in this repository (the `.kicad_pcb` file is empty), so this guide uses
-a piece of perfboard (stripless, 2.54 mm grid). It was written while building one for an
+a piece of perfboard (a prototyping PCB board: stripless, 2.54 mm grid). It was written while building one for an
 **Intergas Xtreme 30** with a generic ESP32-WROOM-32 dev board and ESPHome 2026.9, and that
 build works.
 
@@ -44,7 +44,7 @@ Two rules follow from this, and they protect your boiler:
 | R2, R4 | Resistor | 220 Ω | |
 | J1 | Molex Mini-Fit Jr 4-pin housing + 4 female terminals | | see the [README](./README.md#physical-connection) for part numbers |
 | | ESP32 dev board | | NodeMCU-32S or any ESP32-WROOM-32 board with GPIO16/17 |
-| | Perfboard | about 9 × 6 cm | |
+| | Perfboard (prototyping PCB board) | about 9 × 6 cm | |
 | | Hook-up wire, a 4-core cable for the boiler, 4 female Dupont jumpers for the ESP | | |
 | | USB power supply for the ESP at the boiler | | not the X14 5 V |
 
@@ -63,7 +63,7 @@ assortment kits. Order numbers as of October 2026:
 | R2, R4 | 2 | `METALL 220` | [220 Ω](https://www.reichelt.com/nl/nl/shop/product/metaalfilmweerstand_220_ohm-11627) |
 | J1 | 1 | `MOLEX 39012040` | [Mini-Fit Jr 2x2 housing](https://www.reichelt.com/nl/nl/shop/product/molex-krimpbehuizing_-_mini-fit_jr_-_2x2-polig_-_bus-185702) |
 | J1 | 4 (+1 spare) | `MOLEX 39000039` | [Mini-Fit Jr female contact](https://www.reichelt.com/nl/nl/shop/product/molex-krimpcontact_-_mini-fit_jr_-_bus-185722) |
-| | 1 | `H25PR100` | [Perfboard 100 × 100 mm](https://www.reichelt.com/nl/nl/shop/product/breadboard_hardpapier_100x100mm-8270) |
+| | 1 | `H25PR100` | [Perfboard (prototyping PCB board) 100 × 100 mm](https://www.reichelt.com/nl/nl/shop/product/breadboard_hardpapier_100x100mm-8270) |
 | | 1 | `ESP32DEVKITC32E` or `DEBO JT ESP32-C` | [ESP32 DevKitC (micro-USB)](https://www.reichelt.com/nl/nl/shop/product/ontwikkelbord_esp32-wroom-32e) or [ESP32 (USB-C)](https://www.reichelt.com/nl/nl/shop/product/nodemcu_esp32_wifi-_en_bluetooth-module_usb-c_-395400) |
 
 Skip the ESP32 if you already have one. You also need a USB power supply (any 5 V phone charger)
