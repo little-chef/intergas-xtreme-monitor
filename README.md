@@ -27,6 +27,9 @@ The connection to Home Assistant is done via ESPHome and Wifi.
 
 # Physical connection
 
+New to electronics? [GUIDE.md](./GUIDE.md) walks through a perfboard build step by step,
+with every connection by component and pin, and a read-only first software test.
+
 Prerequisites for the physical connection:
 * Cable required that connect to the X14 connector of the burner control board.
   The type of connector is a Molex Mini-Fit, Jr. connector housing with female
