@@ -15,12 +15,12 @@
     .chiptext{font-family:Menlo,Consolas,"DejaVu Sans Mono",monospace;font-size:11px;fill:#f3f1ec}
     .iso{stroke:#9a3412;stroke-width:1.5;stroke-dasharray:6 5;fill:none}
     .boardbg{fill:#d9c29a;stroke:#b89c6d;stroke-width:2}
-    .hole{fill:#7a5f3c;stroke:#bfa475;stroke-width:2}
+    .hole{fill:#b89a6c;stroke:#cdb588;stroke-width:1.2}
   </style>
   <rect x="0" y="0" width="900" height="640" fill="#ffffff"/>
   <defs>
     <!-- perfboard holes on the 20 px grid: dark hole with a ring slightly darker than the board -->
-    <pattern id="holes" x="-10" y="-10" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="2.6" class="hole"/></pattern>
+    <pattern id="holes" x="-10" y="-10" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="2.2" class="hole"/></pattern>
   </defs>
   <rect x="60" y="20" width="780" height="490" rx="10" class="boardbg"/>
   <rect x="60" y="20" width="780" height="490" rx="10" fill="url(#holes)"/>
