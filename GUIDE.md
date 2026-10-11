@@ -48,6 +48,28 @@ Two rules follow from this, and they protect your boiler:
 | | Hook-up wire, a 4-core cable for the boiler, 4 female Dupont jumpers for the ESP | | |
 | | USB power supply for the ESP at the boiler | | not the X14 5 V |
 
+### Where to buy
+
+[Reichelt](https://www.reichelt.com/) sells all of these per piece, so you don't need to buy
+assortment kits. Order numbers as of October 2026:
+
+| Ref | Qty | Reichelt order no. | Link |
+|---|---|---|---|
+| U1, U3 | 2 | `4N 25` | [4N25 optocoupler](https://www.reichelt.com/nl/nl/shop/product/optocoupler-2509) |
+| Q1, Q2 | 2 | `BC 337-40 DIO` | [BC337-40](https://www.reichelt.com/nl/nl/shop/product/bipolaire_transistor_npn_45v_0_8a_0_625w_to-92-219126) |
+| U2 | 1 | `LP 2950 ACZ3,3` | [LP2950-3.3](https://www.reichelt.com/nl/nl/shop/product/ldo-regelaar_vast_3_3_v_to-92-122756) |
+| C1 | 1 | `RAD FC 22/25` | [22 µF / 25 V](https://www.reichelt.com/nl/nl/shop/product/elko_radiaal_22_f_25_v_105_c_lage_esr_5_x_7_mm_rm_2_5-84588) |
+| R1, R3 | 2 | `METALL 1,00K` | [1 kΩ](https://www.reichelt.com/nl/nl/shop/product/metaalfilmweerstand_1_00_k-ohm-11403) |
+| R2, R4 | 2 | `METALL 220` | [220 Ω](https://www.reichelt.com/nl/nl/shop/product/metaalfilmweerstand_220_ohm-11627) |
+| J1 | 1 | `MOLEX 39012040` | [Mini-Fit Jr 2x2 housing](https://www.reichelt.com/nl/nl/shop/product/molex-krimpbehuizing_-_mini-fit_jr_-_2x2-polig_-_bus-185702) |
+| J1 | 4 (+1 spare) | `MOLEX 39000039` | [Mini-Fit Jr female contact](https://www.reichelt.com/nl/nl/shop/product/molex-krimpcontact_-_mini-fit_jr_-_bus-185722) |
+| | 1 | `H25PR100` | [Perfboard 100 × 100 mm](https://www.reichelt.com/nl/nl/shop/product/breadboard_hardpapier_100x100mm-8270) |
+| | 1 | `ESP32DEVKITC32E` or `DEBO JT ESP32-C` | [ESP32 DevKitC (micro-USB)](https://www.reichelt.com/nl/nl/shop/product/ontwikkelbord_esp32-wroom-32e) or [ESP32 (USB-C)](https://www.reichelt.com/nl/nl/shop/product/nodemcu_esp32_wifi-_en_bluetooth-module_usb-c_-395400) |
+
+Skip the ESP32 if you already have one. You also need a USB power supply (any 5 V phone charger)
+and a matching USB cable for the ESP at the boiler. For the optional sensors below, add a 4.7 kΩ
+resistor (`METALL 4,70K`) and three DS18B20s.
+
 The schematic also shows an **RJ45** connector (an optional way to run the boiler cable over a
 network cable) and an **optional** block with three DS18B20 temperature sensors and a 4.7 kΩ resistor. You don't
 need either; see [The optional part](#the-optional-part-of-the-schematic) at the end.
@@ -187,8 +209,7 @@ remove them before the adapter goes near the boiler, because they bridge the iso
 ## The X14 plug
 
 Crimp one terminal per wire and push them into the Molex housing until they click. Hold the plug
-with its **latch on the left**, looking at the side where the wires go in (this is the same view
-as looking straight into the boiler's X14 header):
+with its **latch on the left**, looking at the side where the wires go in:
 
 | Position | Signal | On the board |
 |---|---|---|
@@ -198,7 +219,8 @@ as looking straight into the boiler's X14 header):
 | bottom-right | RX (boiler receives) | U3 pin 4 / R1 |
 
 This matches [pinout-X14.png](./images/pinout-X14.png). Orient by the latch, not by numbers
-moulded on the plug. If you have a multimeter, check the plug at the boiler before soldering the
+moulded on the plug. Once plugged into the boiler, the latch faces the back of the boiler rather
+than the left. If you have a multimeter, check the plug at the boiler before soldering the
 cable to the board: with the boiler on and the loose ends apart, +5 V to GND reads about 5 V and
 TX to GND about 3.3 V.
 
