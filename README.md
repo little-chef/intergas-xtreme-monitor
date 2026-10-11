@@ -25,6 +25,11 @@ to older settings.
 # Home Assistant
 The connection to Home Assistant is done via ESPHome and Wifi.
 
+# New to electronics?
+
+> **Step-by-step build guide: [GUIDE.md](./GUIDE.md).** It walks through a perfboard (prototyping PCB board) build
+> with a shopping list, every connection by component and pin, and a read-only first software test.
+
 # Physical connection
 
 Prerequisites for the physical connection:

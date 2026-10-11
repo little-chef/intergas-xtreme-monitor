@@ -1,0 +1,165 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 640" width="900" height="640" role="img" aria-label="Wiring map of the X14 adapter. Boiler side on the left with the LP2950 regulator, capacitor, transistor Q1, resistors R2 and R1. Two 4N25 optocouplers straddle the isolation gap. ESP side on the right with resistor R3, R4 and transistor Q2. Dashed stubs mark where the boiler cable and the wires to the ESP32 attach.">
+  <style>
+    .w{fill:none;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+    .n3v3{stroke:#c2410c} .ngnd{stroke:#1f2937} .n5v{stroke:#b45309} .ntx{stroke:#15803d}
+    .nrx{stroke:#1d4ed8} .nsig{stroke:#7c3aed} .nio17{stroke:#0f766e}
+    .stub{stroke-dasharray:2 6}
+    .lbl{font-family:Menlo,Consolas,"DejaVu Sans Mono",monospace;font-size:11px;fill:#1d2329}
+    .lbl-b{font-family:Menlo,Consolas,"DejaVu Sans Mono",monospace;font-size:12px;font-weight:600;fill:#1d2329}
+    .side{font-family:"Arial Narrow",Arial,sans-serif;font-size:16px;font-weight:700;fill:#5d6670;letter-spacing:.08em}
+    .body{fill:#3a3f45;stroke:#2b2f33;stroke-width:1.5}
+    .flat{stroke:#2b2f33;stroke-width:4}
+    .leg{fill:#a8783f;stroke:#2b2f33;stroke-width:1}
+    .nc{fill:none;stroke:#5d6670;stroke-width:1.5}
+    .res{fill:#b89c6d;stroke:#2b2f33;stroke-width:1.5}
+    .chiptext{font-family:Menlo,Consolas,"DejaVu Sans Mono",monospace;font-size:11px;fill:#f3f1ec}
+    .iso{stroke:#9a3412;stroke-width:1.5;stroke-dasharray:6 5;fill:none}
+    .boardbg{fill:#d9c29a;stroke:#b89c6d;stroke-width:2}
+    .hole{fill:#b89a6c;stroke:#cdb588;stroke-width:1.2}
+  </style>
+  <rect x="0" y="0" width="900" height="640" fill="#ffffff"/>
+  <defs>
+    <!-- perfboard holes on the 20 px grid: dark hole with a ring slightly darker than the board -->
+    <pattern id="holes" x="-10" y="-10" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="2.2" class="hole"/></pattern>
+  </defs>
+  <rect x="60" y="20" width="780" height="490" rx="10" class="boardbg"/>
+  <rect x="60" y="20" width="780" height="490" rx="10" fill="url(#holes)"/>
+  <text x="80" y="500" class="side">BOILER SIDE</text>
+  <text x="820" y="500" class="side" text-anchor="end">ESP32 SIDE</text>
+  <line x1="450" y1="30" x2="450" y2="500" class="iso"/>
+  <text x="450" y="512" class="lbl" text-anchor="middle" style="fill:#9a3412">isolation gap</text>
+  <!-- boiler 3.3 V: U2 OUT, C1 +, Q1 C, U3 pin 5 -->
+  <polyline class="w n3v3" points="220,100 220,60 100,60 100,400 420,400"/>
+  <polyline class="w n3v3" points="120,200 100,200"/>
+  <polyline class="w n3v3" points="120,240 100,240"/>
+  <!-- boiler GND: U2 GND, C1 -, R1, U1 pin 2 -->
+  <polyline class="w ngnd" points="140,240 140,160 390,160"/>
+  <polyline class="w ngnd" points="420,120 390,120 390,160"/>
+  <polyline class="w ngnd" points="360,160 360,260"/>
+  <!-- 5 V in -->
+  <polyline class="w n5v" points="160,200 180,200"/>
+  <!-- Q1 E to R2, R2 to U1 pin 1 -->
+  <polyline class="w ntx" points="260,100 300,100"/>
+  <polyline class="w ntx" points="380,100 420,100"/>
+  <!-- RX: R1 bottom to U3 pin 4 -->
+  <polyline class="w nrx" points="360,380 420,380"/>
+
+  <!-- boiler cable stubs -->
+  <polyline class="w n5v stub" points="180,200 180,170"/>
+  <text x="184" y="190" class="lbl-b">+5V from boiler</text>
+  <polyline class="w ngnd stub" points="300,160 300,132"/>
+  <text x="306" y="140" class="lbl-b">GND (boiler)</text>
+  <polyline class="w ntx stub" points="240,100 240,36"/>
+  <text x="246" y="40" class="lbl-b">TX from boiler</text>
+  <polyline class="w nrx stub" points="390,380 390,336"/>
+  <text x="346" y="368" class="lbl-b" text-anchor="end">RX to boiler</text>
+
+  <!-- U2 LP2950: flat face toward the bottom edge; legs OUT GND IN -->
+  <path d="M 104 206 L 176 206 A 36 36 0 0 0 104 206 Z" class="body"/>
+  <line x1="104" y1="206" x2="176" y2="206" class="flat"/>
+  <text x="140" y="190" class="chiptext" text-anchor="middle">2950</text>
+  <circle cx="120" cy="200" r="4.5" class="leg"/><circle cx="140" cy="200" r="4.5" class="leg"/><circle cx="160" cy="200" r="4.5" class="leg"/>
+  <text x="140" y="148" class="lbl-b" text-anchor="middle">U2 LP2950</text>
+  <text x="118" y="222" class="lbl" style="font-size:8px" text-anchor="middle">OUT</text><text x="140" y="222" class="lbl" style="font-size:8px" text-anchor="middle">GND</text><text x="161" y="222" class="lbl" style="font-size:8px" text-anchor="middle">IN</text>
+
+  <!-- C1 22 uF -->
+  <circle cx="130" cy="262" r="17" class="body"/>
+  <rect x="133" y="246" width="9" height="32" style="fill:#5d6670"/>
+  <circle cx="120" cy="240" r="4.5" class="leg"/><circle cx="140" cy="240" r="4.5" class="leg"/>
+  <text x="152" y="292" class="lbl-b">C1 22µF</text>
+  <text x="112" y="236" class="lbl" text-anchor="end">+</text><text x="148" y="236" class="lbl">−</text>
+
+  <!-- Q1 BC337: flat face toward the bottom edge; legs C B E -->
+  <path d="M 204 106 L 276 106 A 36 36 0 0 0 204 106 Z" class="body"/>
+  <line x1="204" y1="106" x2="276" y2="106" class="flat"/>
+  <text x="240" y="90" class="chiptext" text-anchor="middle">337</text>
+  <circle cx="220" cy="100" r="4.5" class="leg"/><circle cx="240" cy="100" r="4.5" class="leg"/><circle cx="260" cy="100" r="4.5" class="leg"/>
+  <text x="220" y="122" class="lbl" text-anchor="middle">C</text><text x="240" y="122" class="lbl" text-anchor="middle">B</text><text x="260" y="122" class="lbl" text-anchor="middle">E</text>
+  <text x="198" y="96" class="lbl-b" text-anchor="end">Q1</text>
+
+  <!-- R2 220 -->
+  <rect x="316" y="92" width="48" height="16" rx="6" class="res"/>
+  <circle cx="300" cy="100" r="4.5" class="leg"/><circle cx="380" cy="100" r="4.5" class="leg"/>
+  <line x1="300" y1="100" x2="316" y2="100" class="w ntx" style="stroke-width:2"/>
+  <line x1="364" y1="100" x2="380" y2="100" class="w ntx" style="stroke-width:2"/>
+  <text x="340" y="84" class="lbl-b" text-anchor="middle">R2 220Ω</text>
+
+  <!-- R1 1k vertical -->
+  <rect x="352" y="288" width="16" height="64" rx="6" class="res"/>
+  <circle cx="360" cy="260" r="4.5" class="leg"/><circle cx="360" cy="380" r="4.5" class="leg"/>
+  <line x1="360" y1="260" x2="360" y2="288" class="w ngnd" style="stroke-width:2"/>
+  <line x1="360" y1="352" x2="360" y2="380" class="w nrx" style="stroke-width:2"/>
+  <text x="344" y="306" class="lbl-b" text-anchor="end">R1 1kΩ</text>
+  <!-- U1: LED on boiler side. pin1 top-left (dot) -->
+  <rect x="428" y="86" width="44" height="68" rx="4" class="body"/>
+  <circle cx="437" cy="96" r="3" style="fill:#f3f1ec"/>
+  <text x="450" y="125" class="chiptext" text-anchor="middle">4N25</text>
+  <circle cx="420" cy="100" r="4.5" class="leg"/><circle cx="420" cy="120" r="4.5" class="leg"/><circle cx="420" cy="140" r="4.5" class="nc"/>
+  <circle cx="480" cy="100" r="4.5" class="nc"/><circle cx="480" cy="120" r="4.5" class="leg"/><circle cx="480" cy="140" r="4.5" class="leg"/>
+  <text x="413" y="96" class="lbl" text-anchor="end">1</text><text x="413" y="116" class="lbl" text-anchor="end">2</text><text x="413" y="146" class="lbl" text-anchor="end">3</text>
+  <text x="487" y="96" class="lbl">6</text><text x="487" y="116" class="lbl">5</text><text x="487" y="146" class="lbl">4</text>
+  <text x="450" y="74" class="lbl-b" text-anchor="middle">U1</text>
+
+  <!-- U3: turned around, LED on ESP side. pin1 bottom-right (dot) -->
+  <rect x="428" y="366" width="44" height="68" rx="4" class="body"/>
+  <circle cx="463" cy="424" r="3" style="fill:#f3f1ec"/>
+  <text x="450" y="405" class="chiptext" text-anchor="middle">4N25</text>
+  <circle cx="420" cy="380" r="4.5" class="leg"/><circle cx="420" cy="400" r="4.5" class="leg"/><circle cx="420" cy="420" r="4.5" class="nc"/>
+  <circle cx="480" cy="380" r="4.5" class="nc"/><circle cx="480" cy="400" r="4.5" class="leg"/><circle cx="480" cy="420" r="4.5" class="leg"/>
+  <text x="413" y="376" class="lbl" text-anchor="end">4</text><text x="413" y="396" class="lbl" text-anchor="end">5</text><text x="413" y="426" class="lbl" text-anchor="end">6</text>
+  <text x="487" y="376" class="lbl">3</text><text x="487" y="396" class="lbl">2</text><text x="487" y="426" class="lbl">1</text>
+  <text x="450" y="452" class="lbl-b" text-anchor="middle">U3 (turned around)</text>
+  <!-- ESP 3.3 V: U1 pin 5, Q2 C -->
+  <polyline class="w n3v3" points="480,120 800,120 800,480 660,480 660,420"/>
+  <!-- GPIO16: U1 pin 4, R3 top -->
+  <polyline class="w nsig" points="480,140 600,140"/>
+  <polyline class="w nsig" points="560,140 560,160"/>
+  <!-- ESP GND: U3 pin 2, R3 bottom -->
+  <polyline class="w ngnd" points="480,400 540,400 540,260 560,260"/>
+  <!-- U3 pin 1 to R4, R4 to Q2 E -->
+  <polyline class="w nio17" points="480,420 520,420"/>
+  <polyline class="w nio17" points="600,420 620,420"/>
+
+  <!-- ESP stubs -->
+  <polyline class="w n3v3 stub" points="720,120 720,46"/>
+  <text x="726" y="50" class="lbl-b">to ESP 3V3</text>
+  <polyline class="w nsig stub" points="600,140 640,140 640,176"/>
+  <text x="646" y="180" class="lbl-b">to ESP GPIO16 (RX2)</text>
+  <polyline class="w ngnd stub" points="540,330 610,330"/>
+  <text x="616" y="334" class="lbl-b">to ESP GND</text>
+  <polyline class="w nio17 stub" points="640,420 640,470"/>
+  <text x="646" y="470" class="lbl-b">from ESP GPIO17 (TX2)</text>
+
+  <!-- R3 1k vertical -->
+  <rect x="552" y="180" width="16" height="60" rx="6" class="res"/>
+  <circle cx="560" cy="160" r="4.5" class="leg"/><circle cx="560" cy="260" r="4.5" class="leg"/>
+  <line x1="560" y1="160" x2="560" y2="180" class="w nsig" style="stroke-width:2"/>
+  <line x1="560" y1="240" x2="560" y2="260" class="w ngnd" style="stroke-width:2"/>
+  <text x="576" y="214" class="lbl-b">R3 1kΩ</text>
+
+  <!-- R4 220 -->
+  <rect x="536" y="412" width="48" height="16" rx="6" class="res"/>
+  <circle cx="520" cy="420" r="4.5" class="leg"/><circle cx="600" cy="420" r="4.5" class="leg"/>
+  <line x1="520" y1="420" x2="536" y2="420" class="w nio17" style="stroke-width:2"/>
+  <line x1="584" y1="420" x2="600" y2="420" class="w nio17" style="stroke-width:2"/>
+  <text x="560" y="448" class="lbl-b" text-anchor="middle">R4 220Ω</text>
+
+  <!-- Q2 BC337: flat face toward the TOP edge; legs E B C -->
+  <path d="M 604 414 L 676 414 A 36 36 0 0 1 604 414 Z" class="body"/>
+  <line x1="604" y1="414" x2="676" y2="414" class="flat"/>
+  <text x="640" y="438" class="chiptext" text-anchor="middle">337</text>
+  <circle cx="620" cy="420" r="4.5" class="leg"/><circle cx="640" cy="420" r="4.5" class="leg"/><circle cx="660" cy="420" r="4.5" class="leg"/>
+  <text x="620" y="404" class="lbl" text-anchor="middle">E</text><text x="640" y="404" class="lbl" text-anchor="middle">B</text><text x="660" y="404" class="lbl" text-anchor="middle">C</text>
+  <text x="676" y="398" class="lbl-b">Q2, flat up</text>
+  <!-- legend -->
+  <line x1="70" y1="550" x2="94" y2="550" class="w n3v3"/><text x="102" y="554" class="lbl">3.3 V (each side its own)</text>
+  <line x1="275" y1="550" x2="299" y2="550" class="w ngnd"/><text x="307" y="554" class="lbl">GND (each side its own)</text>
+  <line x1="480" y1="550" x2="504" y2="550" class="w n5v"/><text x="512" y="554" class="lbl">+5 V from boiler</text>
+  <line x1="685" y1="550" x2="709" y2="550" class="w ntx"/><text x="717" y="554" class="lbl">boiler to ESP signal</text>
+  <line x1="70" y1="576" x2="94" y2="576" class="w nsig"/><text x="102" y="580" class="lbl">GPIO16 (ESP receives)</text>
+  <line x1="275" y1="576" x2="299" y2="576" class="w nio17"/><text x="307" y="580" class="lbl">GPIO17 path (ESP sends)</text>
+  <line x1="480" y1="576" x2="504" y2="576" class="w nrx"/><text x="512" y="580" class="lbl">ESP to boiler signal</text>
+  <line x1="685" y1="576" x2="709" y2="576" class="w ngnd stub"/><text x="717" y="580" class="lbl">loose wire to cable/ESP</text>
+  <text x="70" y="612" class="lbl" style="fill:#5d6670">Top view, about 9 x 6 cm on 2.54 mm perfboard. Hollow circles: chip pins left unconnected.</text>
+  <text x="70" y="628" class="lbl" style="fill:#5d6670">The two 3.3 V and the two GND circuits are separate: nothing may cross the dashed gap except the two 4N25s.</text>
+</svg>
